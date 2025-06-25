@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản lý giao dịch - Admin</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f8f8f8;
+    }
+    h1 {
+      color: #333;
+    }
+    .transaction {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    button {
+      padding: 5px 10px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    const password = prompt("🔒 Nhập mật khẩu admin:");
+    if (password !== "Maka26042006") {
+      document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:50px;'>❌ Sai mật khẩu. Truy cập bị từ chối.</h2>";
+      throw new Error("Truy cập bị chặn");
+    }
+  </script>
+
+  <h1>📋 Giao dịch chờ duyệt</h1>
+  <div id="list"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+    import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db);
+
+    const listDiv = document.getElementById("list");
+
+    get(child(dbRef, "transactions")).then((snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        Object.keys(data).forEach((id) => {
+          const txn = data[id];
+          if (txn.status === "pending") {
+            const div = document.createElement("div");
+            div.className = "transaction";
+            div.innerHTML = `
+              <b>Username:</b> ${txn.username}<br>
+              <b>Số tiền:</b> ${txn.amount}<br>
+              <b>Nội dung:</b> ${txn.note}<br>
+              <b>Trạng thái:</b> ${txn.status}<br>
+              <button onclick="approveTransaction('${id}')">Duyệt</button>
+            `;
+            listDiv.appendChild(div);
+          }
+        });
+      } else {
+        listDiv.innerHTML = "⛔ Không có giao dịch chờ duyệt.";
+      }
+    });
+
+    window.approveTransaction = function (id) {
+      update(ref(db, `transactions/${id}`), {
+        status: "approved"
+      }).then(() => {
+        alert("✅ Đã duyệt giao dịch.");
+        location.reload();
+      });
+    };
+  </script>
+</body>
+</html>
