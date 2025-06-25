@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Top Nạp | Shop Free Fire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; background: #f7f7f7; padding: 20px; }
+    h2 { text-align: center; }
+    table { width: 100%; max-width: 500px; margin: auto; border-collapse: collapse; background: white; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background-color: #28a745; color: white; }
+    tr:hover { background-color: #f1f1f1; }
+  </style>
+</head>
+<body>
+  <h2>🏆 BẢNG XẾP HẠNG TOP NẠP</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Hạng</th>
+        <th>Tên</th>
+        <th>Số dư</th>
+      </tr>
+    </thead>
+    <tbody id="topList">
+      <!-- Dữ liệu sẽ được thêm ở đây -->
+    </tbody>
+  </table>
+
+  <!-- Firebase -->
+  <script src="firebase.js"></script>
+  <script>
+    const topList = document.getElementById('topList');
+
+    firebase.database().ref('users').once('value').then(snapshot => {
+      const users = [];
+      snapshot.forEach(child => {
+        const data = child.val();
+        users.push({ ten: data.ten, sodu: data.sodu || 0 });
+      });
+
+      users.sort((a, b) => b.sodu - a.sodu); // sắp xếp từ cao xuống thấp
+
+      users.slice(0, 10).forEach((user, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${user.ten}</td>
+          <td>${user.sodu.toLocaleString()}đ</td>
+        `;
+        topList.appendChild(row);
+      });
+    });
+  </script>
+</body>
+</html>
