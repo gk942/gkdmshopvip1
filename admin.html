@@ -1,123 +1,164 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quản trị giao dịch - Shop Free Fire</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #fff;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      color: #00ffcc;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #1e1e1e;
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid #333;
-      text-align: center;
-    }
-    th {
-      background-color: #333;
-    }
-    #login {
-      margin-top: 50px;
-      text-align: center;
-    }
-    input[type="password"] {
-      padding: 10px;
-      font-size: 16px;
-      width: 250px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #00ffcc;
-      color: #000;
-      border: none;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin - Quản lý giao dịch</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    margin: 0; padding: 0;
+  }
+  .login-container, .admin-container {
+    max-width: 600px;
+    margin: 100px auto;
+    background: #1f1f1f;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  h1 {
+    text-align: center;
+    color: #4caf50;
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+  }
+  input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  button {
+    background: #4caf50;
+    border: none;
+    padding: 10px 15px;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+  }
+  button:hover {
+    background: #45a045;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  thead {
+    background: #333;
+  }
+  th, td {
+    padding: 12px;
+    border: 1px solid #444;
+    text-align: center;
+  }
+  tbody tr:nth-child(even) {
+    background: #222;
+  }
+  .hidden {
+    display: none;
+  }
+  .error {
+    color: #ff5252;
+    margin-bottom: 10px;
+  }
+</style>
 </head>
 <body>
 
-  <div id="login">
-    <h2>Nhập mật khẩu admin để xem giao dịch</h2>
-    <input type="password" id="passwordInput" placeholder="Mật khẩu admin">
-    <button onclick="checkPassword()">Xác nhận</button>
-  </div>
+<div class="login-container" id="loginDiv">
+  <h1>Đăng nhập Admin</h1>
+  <label for="adminPass">Nhập mật khẩu:</label>
+  <input type="password" id="adminPass" placeholder="Mật khẩu admin..." />
+  <div class="error" id="errorMsg"></div>
+  <button onclick="checkPass()">Đăng nhập</button>
+</div>
 
-  <div id="adminPanel" style="display:none;">
-    <h1>Giao dịch gần đây</h1>
-    <table id="transactionsTable">
-      <thead>
-        <tr>
-          <th>Người chuyển</th>
-          <th>Số tiền</th>
-          <th>Nội dung</th>
-          <th>Thời gian</th>
-        </tr>
-      </thead>
-      <tbody id="transactionBody">
-        <!-- Giao dịch sẽ được hiển thị ở đây -->
-      </tbody>
-    </table>
-  </div>
+<div class="admin-container hidden" id="adminDiv">
+  <h1>Quản lý giao dịch</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Tên người mua</th>
+        <th>Số tiền nạp</th>
+        <th>Thời gian</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody id="transactionBody">
+      <!-- Dữ liệu giả lập -->
+      <tr>
+        <td>001</td>
+        <td>Nguyễn Văn A</td>
+        <td>100.000đ</td>
+        <td>2025-06-25 14:00</td>
+        <td id="status-001">Chờ duyệt</td>
+        <td>
+          <button onclick="approve('001')">Duyệt</button>
+          <button onclick="reject('001')">Hủy</button>
+        </td>
+      </tr>
+      <tr>
+        <td>002</td>
+        <td>Trần Thị B</td>
+        <td>200.000đ</td>
+        <td>2025-06-25 15:30</td>
+        <td id="status-002">Chờ duyệt</td>
+        <td>
+          <button onclick="approve('002')">Duyệt</button>
+          <button onclick="reject('002')">Hủy</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button onclick="logout()" style="margin-top: 20px; background:#ff4444;">Đăng xuất</button>
+</div>
 
-  <script type="module">
-    // Firebase cấu hình
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js";
+<script>
+  const ADMIN_PASS = "Maka26042006";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
-      authDomain: "gkdmshop.firebaseapp.com",
-      projectId: "gkdmshop",
-      storageBucket: "gkdmshop.appspot.com",
-      messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef",
-      measurementId: "G-V4QFPWK82L"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.checkPassword = function () {
-      const input = document.getElementById("passwordInput").value;
-      if (input === "Maka26042006") {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("adminPanel").style.display = "block";
-        loadTransactions();
-      } else {
-        alert("Sai mật khẩu!");
-      }
-    };
-
-    async function loadTransactions() {
-      const querySnapshot = await getDocs(collection(db, "transactions"));
-      const tbody = document.getElementById("transactionBody");
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${data.name || 'Ẩn danh'}</td>
-          <td>${data.amount || 0}</td>
-          <td>${data.message || ''}</td>
-          <td>${data.time || ''}</td>
-        `;
-        tbody.appendChild(row);
-      });
+  function checkPass() {
+    const pass = document.getElementById("adminPass").value;
+    const errorMsg = document.getElementById("errorMsg");
+    if (pass === ADMIN_PASS) {
+      document.getElementById("loginDiv").classList.add("hidden");
+      document.getElementById("adminDiv").classList.remove("hidden");
+      errorMsg.textContent = "";
+    } else {
+      errorMsg.textContent = "Mật khẩu sai, vui lòng thử lại!";
     }
-  </script>
+  }
+
+  function approve(id) {
+    const statusTd = document.getElementById("status-" + id);
+    statusTd.textContent = "Đã duyệt";
+    statusTd.style.color = "#4caf50";
+  }
+
+  function reject(id) {
+    const statusTd = document.getElementById("status-" + id);
+    statusTd.textContent = "Đã hủy";
+    statusTd.style.color = "#f44336";
+  }
+
+  function logout() {
+    document.getElementById("adminPass").value = "";
+    document.getElementById("loginDiv").classList.remove("hidden");
+    document.getElementById("adminDiv").classList.add("hidden");
+  }
+</script>
+
 </body>
 </html>
