@@ -3,97 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quản lý giao dịch - Admin</title>
+  <title>Quản lý giao dịch | Admin</title>
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
       padding: 20px;
-      background: #f8f8f8;
     }
-    h1 {
-      color: #333;
-    }
-    .transaction {
+    .container {
+      max-width: 600px;
+      margin: auto;
       background: white;
-      border: 1px solid #ccc;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; color: #333; }
+    input[type="password"], input[type="text"] {
+      width: 100%;
       padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 5px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
     button {
-      padding: 5px 10px;
-      background-color: green;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #007bff;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
+    .hidden { display: none; }
+    .transaction {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+    }
   </style>
 </head>
 <body>
-  <script>
-    const password = prompt("🔒 Nhập mật khẩu admin:");
-    if (password !== "Maka26042006") {
-      document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:50px;'>❌ Sai mật khẩu. Truy cập bị từ chối.</h2>";
-      throw new Error("Truy cập bị chặn");
-    }
-  </script>
+  <div class="container">
+    <h2>Đăng nhập Admin</h2>
+    <div id="loginForm">
+      <input type="password" id="adminPass" placeholder="Nhập mật khẩu admin"/>
+      <button onclick="checkPassword()">Đăng nhập</button>
+    </div>
 
-  <h1>📋 Giao dịch chờ duyệt</h1>
-  <div id="list"></div>
+    <div id="adminPanel" class="hidden">
+      <h2>Danh sách giao dịch chờ duyệt</h2>
+      <div id="transactionList">Đang tải dữ liệu...</div>
+    </div>
+  </div>
 
-  <!-- Firebase SDK -->
+  <script type="module" src="firebase.js"></script>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { app } from './firebase.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
-      authDomain: "gkdmshop.firebaseapp.com",
-      projectId: "gkdmshop",
-      storageBucket: "gkdmshop.appspot.com",
-      messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef",
-      measurementId: "G-V4QFPWK82L"
-    };
+    const database = getDatabase(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const dbRef = ref(db);
+    const adminPassword = "Maka26042006";
 
-    const listDiv = document.getElementById("list");
-
-    get(child(dbRef, "transactions")).then((snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        Object.keys(data).forEach((id) => {
-          const txn = data[id];
-          if (txn.status === "pending") {
-            const div = document.createElement("div");
-            div.className = "transaction";
-            div.innerHTML = `
-              <b>Username:</b> ${txn.username}<br>
-              <b>Số tiền:</b> ${txn.amount}<br>
-              <b>Nội dung:</b> ${txn.note}<br>
-              <b>Trạng thái:</b> ${txn.status}<br>
-              <button onclick="approveTransaction('${id}')">Duyệt</button>
-            `;
-            listDiv.appendChild(div);
-          }
-        });
+    window.checkPassword = function () {
+      const pass = document.getElementById("adminPass").value;
+      if (pass === adminPassword) {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("adminPanel").classList.remove("hidden");
+        loadTransactions();
       } else {
-        listDiv.innerHTML = "⛔ Không có giao dịch chờ duyệt.";
+        alert("Sai mật khẩu!");
       }
-    });
+    }
 
-    window.approveTransaction = function (id) {
-      update(ref(db, `transactions/${id}`), {
-        status: "approved"
-      }).then(() => {
-        alert("✅ Đã duyệt giao dịch.");
-        location.reload();
+    function loadTransactions() {
+      const transRef = ref(database, 'transactions');
+      onValue(transRef, (snapshot) => {
+        const data = snapshot.val();
+        const listEl = document.getElementById("transactionList");
+        listEl.innerHTML = "";
+
+        if (!data) {
+          listEl.innerHTML = "Không có giao dịch nào.";
+          return;
+        }
+
+        Object.entries(data).forEach(([key, value]) => {
+          const div = document.createElement("div");
+          div.className = "transaction";
+          div.innerHTML = `
+            <p><strong>Tên:</strong> ${value.name}</p>
+            <p><strong>Số tiền:</strong> ${value.amount}</p>
+            <p><strong>Nội dung:</strong> ${value.content}</p>
+            <button onclick="approve('${key}')">Duyệt</button>
+          `;
+          listEl.appendChild(div);
+        });
       });
-    };
+    }
+
+    window.approve = function (key) {
+      const transRef = ref(database, 'transactions/' + key);
+      remove(transRef)
+        .then(() => alert("Đã duyệt và xoá giao dịch!"))
+        .catch(err => alert("Lỗi: " + err));
+    }
   </script>
 </body>
 </html>
