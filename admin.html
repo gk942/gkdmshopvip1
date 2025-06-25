@@ -1,113 +1,122 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quản lý giao dịch | Admin</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản trị giao dịch - Shop Free Fire</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f2f5;
+      background-color: #121212;
+      color: #fff;
       margin: 0;
       padding: 20px;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    h1 {
+      color: #00ffcc;
     }
-    h2 { text-align: center; color: #333; }
-    input[type="password"], input[type="text"] {
+    table {
       width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #1e1e1e;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #333;
+      text-align: center;
+    }
+    th {
+      background-color: #333;
+    }
+    #login {
+      margin-top: 50px;
+      text-align: center;
+    }
+    input[type="password"] {
       padding: 10px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      font-size: 16px;
+      width: 250px;
     }
     button {
-      margin-top: 15px;
       padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
+      font-size: 16px;
+      background-color: #00ffcc;
+      color: #000;
       border: none;
-      border-radius: 4px;
       cursor: pointer;
-    }
-    .hidden { display: none; }
-    .transaction {
-      border-bottom: 1px solid #ccc;
-      padding: 10px 0;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Đăng nhập Admin</h2>
-    <div id="loginForm">
-      <input type="password" id="adminPass" placeholder="Nhập mật khẩu admin"/>
-      <button onclick="checkPassword()">Đăng nhập</button>
-    </div>
 
-    <div id="adminPanel" class="hidden">
-      <h2>Danh sách giao dịch chờ duyệt</h2>
-      <div id="transactionList">Đang tải dữ liệu...</div>
-    </div>
+  <div id="login">
+    <h2>Nhập mật khẩu admin để xem giao dịch</h2>
+    <input type="password" id="passwordInput" placeholder="Mật khẩu admin">
+    <button onclick="checkPassword()">Xác nhận</button>
   </div>
 
-  <script type="module" src="firebase.js"></script>
+  <div id="adminPanel" style="display:none;">
+    <h1>Giao dịch gần đây</h1>
+    <table id="transactionsTable">
+      <thead>
+        <tr>
+          <th>Người chuyển</th>
+          <th>Số tiền</th>
+          <th>Nội dung</th>
+          <th>Thời gian</th>
+        </tr>
+      </thead>
+      <tbody id="transactionBody">
+        <!-- Giao dịch sẽ được hiển thị ở đây -->
+      </tbody>
+    </table>
+  </div>
+
   <script type="module">
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-    import { app } from './firebase.js';
+    // Firebase cấu hình
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js";
 
-    const database = getDatabase(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
+    };
 
-    const adminPassword = "Maka26042006";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     window.checkPassword = function () {
-      const pass = document.getElementById("adminPass").value;
-      if (pass === adminPassword) {
-        document.getElementById("loginForm").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
+      const input = document.getElementById("passwordInput").value;
+      if (input === "Maka26042006") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
         loadTransactions();
       } else {
         alert("Sai mật khẩu!");
       }
-    }
+    };
 
-    function loadTransactions() {
-      const transRef = ref(database, 'transactions');
-      onValue(transRef, (snapshot) => {
-        const data = snapshot.val();
-        const listEl = document.getElementById("transactionList");
-        listEl.innerHTML = "";
-
-        if (!data) {
-          listEl.innerHTML = "Không có giao dịch nào.";
-          return;
-        }
-
-        Object.entries(data).forEach(([key, value]) => {
-          const div = document.createElement("div");
-          div.className = "transaction";
-          div.innerHTML = `
-            <p><strong>Tên:</strong> ${value.name}</p>
-            <p><strong>Số tiền:</strong> ${value.amount}</p>
-            <p><strong>Nội dung:</strong> ${value.content}</p>
-            <button onclick="approve('${key}')">Duyệt</button>
-          `;
-          listEl.appendChild(div);
-        });
+    async function loadTransactions() {
+      const querySnapshot = await getDocs(collection(db, "transactions"));
+      const tbody = document.getElementById("transactionBody");
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${data.name || 'Ẩn danh'}</td>
+          <td>${data.amount || 0}</td>
+          <td>${data.message || ''}</td>
+          <td>${data.time || ''}</td>
+        `;
+        tbody.appendChild(row);
       });
-    }
-
-    window.approve = function (key) {
-      const transRef = ref(database, 'transactions/' + key);
-      remove(transRef)
-        .then(() => alert("Đã duyệt và xoá giao dịch!"))
-        .catch(err => alert("Lỗi: " + err));
     }
   </script>
 </body>
