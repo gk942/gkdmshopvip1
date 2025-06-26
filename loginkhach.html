@@ -1,90 +1,43 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Đăng nhập khách hàng | GKDM Shop</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      background: #f7f7f7;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .login-box {
-      background: white;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #ff6b00;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .register-link {
-      margin-top: 15px;
-      text-align: center;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Đăng nhập khách</title>
 </head>
 <body>
+  <h2>Đăng nhập hoặc Đăng ký</h2>
 
-  <div class="login-box">
-    <h2>Đăng nhập</h2>
-    <input type="email" id="email" placeholder="Email" required/>
-    <input type="password" id="password" placeholder="Mật khẩu" required/>
-    <button onclick="login()">Đăng nhập</button>
-    <div class="register-link">
-      Chưa có tài khoản? <a href="registerkhach.html">Đăng ký</a>
-    </div>
-  </div>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="pass" placeholder="Mật khẩu"><br>
+  <button onclick="login()">Đăng nhập</button>
+  <button onclick="signup()">Đăng ký</button>
+  <p id="status"></p>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
-  <!-- Firebase Config -->
   <script src="firebase.js"></script>
-
   <script>
+    const auth = firebase.auth();
+
     function login() {
       const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          alert("Đăng nhập thành công!");
-          localStorage.setItem("khachLogin", JSON.stringify(user));
-          window.location.href = "index.html";
+      const pass = document.getElementById("pass").value;
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(user => {
+          localStorage.setItem("uid", user.user.uid);
+          document.getElementById("status").innerText = "Đăng nhập thành công!";
         })
-        .catch((error) => {
-          alert("Sai tài khoản hoặc mật khẩu!");
-          console.error(error);
-        });
+        .catch(e => document.getElementById("status").innerText = e.message);
+    }
+
+    function signup() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("pass").value;
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then(user => {
+          localStorage.setItem("uid", user.user.uid);
+          document.getElementById("status").innerText = "Đăng ký thành công!";
+        })
+        .catch(e => document.getElementById("status").innerText = e.message);
     }
   </script>
 </body>
