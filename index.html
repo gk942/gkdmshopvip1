@@ -1,138 +1,199 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GKDM Shop - Bán Acc Free Fire</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GKDM SHOP - Bán Acc Free Fire Uy Tín</title>
+  <link rel="stylesheet" href="style.css"/>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
+      background: #f7f7f7;
+      color: #333;
     }
     header {
-      background: #222;
-      color: #fff;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header h1 {
-      font-size: 20px;
-    }
-    .menu-icon {
-      font-size: 24px;
-      cursor: pointer;
-    }
-    .menu {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      display: none;
-      flex-direction: column;
-    }
-    .menu a {
-      padding: 10px;
-      text-decoration: none;
-      color: #333;
-      border-bottom: 1px solid #eee;
-    }
-    .menu a:last-child {
-      border-bottom: none;
-    }
-    .top-nap {
+      background: #ff4d4f;
+      color: white;
       padding: 15px;
+      text-align: center;
     }
-    .top-nap h2 {
-      margin-top: 0;
-      font-size: 18px;
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+    }
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #fff;
+      border-bottom: 2px solid #eee;
+    }
+    nav a {
+      padding: 14px 20px;
+      display: block;
       color: #333;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    nav a:hover {
+      background: #ffeded;
+    }
+    .container {
+      padding: 20px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section h2 {
+      border-left: 4px solid #ff4d4f;
+      padding-left: 10px;
     }
     .acc-list {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-      padding: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
     }
     .acc-item {
-      background: #fff;
-      padding: 10px;
+      background: white;
+      padding: 15px;
       border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    .acc-item h3 {
-      font-size: 16px;
-      margin: 0 0 5px;
-    }
-    .acc-item p {
-      margin: 0;
-      color: #555;
-    }
-    .nav-buttons {
+      box-shadow: 0 0 5px #ccc;
       text-align: center;
-      margin-top: 10px;
     }
-    .nav-buttons a {
-      display: inline-block;
-      margin: 0 10px;
-      padding: 8px 16px;
-      background: #0066ff;
+    .acc-item img {
+      width: 100%;
+      border-radius: 5px;
+    }
+    .btn {
+      background: #ff4d4f;
       color: white;
-      border-radius: 6px;
-      text-decoration: none;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+    .login-box {
+      background: #fff;
+      padding: 15px;
+      max-width: 300px;
+      margin: 0 auto 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ddd;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .topnap-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .topnap-table th, .topnap-table td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: #eee;
+      color: #555;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>GKDM SHOP</h1>
-    <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    <div class="logo">GKDM SHOP</div>
+    <div>Bán Acc Free Fire Uy Tín - Tự Động 24/24</div>
   </header>
 
-  <div class="menu" id="menu">
-    <a href="#">Tài khoản: User123</a>
-    <a href="#">Số dư: 0đ</a>
-    <a href="top-nap.html">Lịch sử nạp</a>
-    <a href="nap-tien.html">Nạp tiền</a>
+  <nav>
+    <a href="index.html">Trang chủ</a>
+    <a href="naptien.html">Nạp tiền</a>
     <a href="admin.html">Admin</a>
+  </nav>
+
+  <div class="container">
+
+    <div class="login-box" id="login-box">
+      <h3>Đăng nhập</h3>
+      <input type="text" id="username" placeholder="Tên đăng nhập"/>
+      <button class="btn" onclick="login()">Đăng nhập</button>
+    </div>
+
+    <div class="section" id="welcome" style="display: none;">
+      <h2>Xin chào, <span id="userDisplay"></span>!</h2>
+      <button class="btn" onclick="logout()">Đăng xuất</button>
+    </div>
+
+    <div class="section">
+      <h2>Top Nạp</h2>
+      <table class="topnap-table">
+        <tr>
+          <th>Hạng</th>
+          <th>Người dùng</th>
+          <th>Số tiền</th>
+        </tr>
+        <tr><td>1</td><td>kaito123</td><td>500.000đ</td></tr>
+        <tr><td>2</td><td>hungvip</td><td>300.000đ</td></tr>
+        <tr><td>3</td><td>nhokff</td><td>200.000đ</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>Danh mục acc Free Fire</h2>
+      <div class="acc-list">
+        <div class="acc-item">
+          <img src="images/acc1.jpg" alt="Acc FF 1">
+          <p>Acc Free Fire #1</p>
+          <p>Giá: 100.000đ</p>
+          <button class="btn">Mua ngay</button>
+        </div>
+        <div class="acc-item">
+          <img src="images/acc2.jpg" alt="Acc FF 2">
+          <p>Acc Free Fire #2</p>
+          <p>Giá: 150.000đ</p>
+          <button class="btn">Mua ngay</button>
+        </div>
+        <!-- Thêm acc khác ở đây -->
+      </div>
+    </div>
+
   </div>
 
-  <section class="top-nap">
-    <h2>🏆 Bảng Top Nạp</h2>
-    <ul>
-      <li>1. uservip - 1.000.000đ</li>
-      <li>2. hieu123 - 800.000đ</li>
-      <li>3. thanh98 - 500.000đ</li>
-    </ul>
-  </section>
-
-  <section class="acc-list">
-    <div class="acc-item">
-      <h3>Acc #1</h3>
-      <p>Level 65 | Súng X7 | 200K</p>
-    </div>
-    <div class="acc-item">
-      <h3>Acc #2</h3>
-      <p>Level 70 | Full Pet | 300K</p>
-    </div>
-    <!-- Thêm acc tùy ý -->
-  </section>
-
-  <div class="nav-buttons">
-    <a href="nap-tien.html">Nạp Tiền</a>
-    <a href="admin.html">Admin</a>
-  </div>
+  <footer>
+    © 2025 GKDM Shop - Đảm bảo uy tín, tự động 100%
+  </footer>
 
   <script>
-    function toggleMenu() {
-      var menu = document.getElementById('menu');
-      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    function login() {
+      const username = document.getElementById('username').value;
+      if(username.trim() !== '') {
+        localStorage.setItem('username', username);
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('welcome').style.display = 'block';
+        document.getElementById('userDisplay').textContent = username;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('username');
+      location.reload();
+    }
+
+    // Tự động hiển thị nếu đã đăng nhập
+    window.onload = function () {
+      const user = localStorage.getItem('username');
+      if(user) {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('welcome').style.display = 'block';
+        document.getElementById('userDisplay').textContent = user;
+      }
     }
   </script>
 
