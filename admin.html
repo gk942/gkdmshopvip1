@@ -2,79 +2,45 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quản lý giao dịch</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial; background: #eef2f3; padding: 20px; }
-    .hidden { display: none; }
-    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-    .item { border-bottom: 1px solid #ccc; padding: 10px 0; }
-    button { margin-top: 5px; }
-  </style>
+  <title>Admin Duyệt Giao Dịch</title>
 </head>
 <body>
-  <div class="container" id="loginForm">
-    <h2>Đăng nhập Admin</h2>
-    <input type="password" id="adminPass" placeholder="Nhập mật khẩu admin">
-    <button onclick="checkPassword()">Đăng nhập</button>
-    <p id="loginStatus" style="color:red;"></p>
-  </div>
+  <h2>ADMIN - DUYỆT GIAO DỊCH</h2>
 
-  <div class="container hidden" id="adminPanel">
-    <h2>Danh sách giao dịch</h2>
-    <div id="transactionList"></div>
-  </div>
+  <div id="admin"></div>
+  <div id="list"></div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
-      authDomain: "gkdmshop.firebaseapp.com",
-      projectId: "gkdmshop",
-      storageBucket: "gkdmshop.appspot.com",
-      messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    const correctPass = "Maka26042006";
-
-    function checkPassword() {
-      const pass = document.getElementById("adminPass").value;
-      if (pass === correctPass) {
-        document.getElementById("loginForm").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadTransactions();
-      } else {
-        document.getElementById("loginStatus").innerText = "Sai mật khẩu!";
-      }
+    const pass = prompt("Nhập mật khẩu admin:");
+    if (pass !== "Maka26042006") {
+      document.body.innerHTML = "<h2>Sai mật khẩu</h2>";
+      throw new Error("Không có quyền truy cập");
     }
 
-    function loadTransactions() {
-      const list = document.getElementById("transactionList");
-      list.innerHTML = '';
-      database.ref("transactions").on("value", snapshot => {
-        list.innerHTML = '';
-        snapshot.forEach(child => {
-          const data = child.val();
-          const div = document.createElement("div");
-          div.className = "item";
-          div.innerHTML = `
-            <strong>UID:</strong> ${data.uid}<br>
-            <strong>Thời gian:</strong> ${data.time}<br>
-            <strong>Trạng thái:</strong> <span id="status-${data.uid}">${data.status}</span><br>
-            ${data.status !== "Thành công" ? `<button onclick="duyet('${data.uid}')">Duyệt</button>` : ''}
-          `;
-          list.appendChild(div);
-        });
+    const listDiv = document.getElementById("list");
+    const ref = database.ref("giaodich");
+
+    ref.on("value", snapshot => {
+      listDiv.innerHTML = "";
+      snapshot.forEach(child => {
+        const data = child.val();
+        const key = child.key;
+
+        const box = document.createElement("div");
+        box.innerHTML = `
+          <p><strong>UID:</strong> ${data.uid}</p>
+          <p><strong>Nội dung:</strong> ${data.noidung}</p>
+          <p><strong>Trạng thái:</strong> ${data.trangthai}</p>
+          ${data.trangthai === "Đang chờ" ? `<button onclick="duyet('${key}')">Duyệt</button>` : ""}
+          <hr/>
+        `;
+        listDiv.appendChild(box);
       });
-    }
+    });
 
-    function duyet(uid) {
-      database.ref("transactions/" + uid).update({ status: "Thành công" });
-      document.getElementById("status-" + uid).innerText = "Thành công";
+    function duyet(id) {
+      database.ref("giaodich/" + id).update({ trangthai: "Thành công" });
     }
   </script>
 </body>
