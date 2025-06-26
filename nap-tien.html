@@ -1,57 +1,39 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Nạp tiền | Shop Free Fire</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial; background: #f2f2f2; padding: 20px; }
-    .form-container { background: #fff; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input, button { width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; }
-    button { background-color: #28a745; color: white; border: none; cursor: pointer; }
-    button:hover { background-color: #218838; }
-    h2 { text-align: center; }
-  </style>
-</head>
-<body>
-  <div class="form-container">
-    <h2>Nạp Tiền</h2>
-    <input type="text" id="username" placeholder="Tên người dùng">
-    <input type="number" id="amount" placeholder="Số tiền (VNĐ)">
-    <input type="text" id="noidung" placeholder="Nội dung chuyển khoản (ví dụ: NAP123456)">
-    <button onclick="napTien()">Nạp Tiền</button>
-    <p id="status"></p>
-  </div>
+<!-- Hiển thị danh sách giao dịch -->
+<div id="transactions-container"></div>
 
-  <!-- Firebase Script -->
-  <script src="firebase.js"></script>
-  <script>
-    function napTien() {
-      const username = document.getElementById('username').value.trim();
-      const amount = parseInt(document.getElementById('amount').value);
-      const noidung = document.getElementById('noidung').value.trim();
-      const status = document.getElementById('status');
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-      if (!username || !amount || !noidung) {
-        status.innerText = "Vui lòng điền đầy đủ thông tin!";
-        status.style.color = "red";
-        return;
-      }
+  const firebaseConfig = {
+    apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+    authDomain: "gkdmshop.firebaseapp.com",
+    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+    projectId: "gkdmshop",
+    storageBucket: "gkdmshop.appspot.com",
+    messagingSenderId: "52437838526",
+    appId: "1:52437838526:web:3187795557aa1458190cef",
+  };
 
-      const userRef = firebase.database().ref('users/' + username);
-      userRef.once('value').then(snapshot => {
-        const currentData = snapshot.val();
-        const newBalance = (currentData && currentData.sodu ? currentData.sodu : 0) + amount;
-        userRef.set({
-          ten: username,
-          sodu: newBalance,
-          noidung: noidung,
-          lastNap: new Date().toLocaleString()
-        });
-        status.innerText = "Nạp tiền thành công! Số dư mới: " + newBalance + "đ";
-        status.style.color = "green";
-      });
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const transRef = ref(db, "transactions");
+
+  onValue(transRef, (snapshot) => {
+    const data = snapshot.val();
+    const container = document.getElementById("transactions-container");
+    container.innerHTML = "";
+
+    for (const key in data) {
+      const { username, amount, status } = data[key];
+      const statusText = status === "approved" ? "✅ Thành công" : "⏳ Đang chờ duyệt";
+
+      container.innerHTML += `
+        <div style="margin-bottom:10px;">
+          <strong>${username}</strong> nạp <strong>${amount}đ</strong> - <em>${statusText}</em>
+        </div>
+      `;
     }
-  </script>
-</body>
-</html>
+  });
+</script>
