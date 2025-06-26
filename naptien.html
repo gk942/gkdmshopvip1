@@ -2,73 +2,120 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Nạp Tiền - Shop</title>
-  <script src="firebase.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nạp Tiền - GKDM Shop</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #333;
       padding: 20px;
+      text-align: center;
     }
+
     .container {
       max-width: 500px;
       margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
     }
-    .input-group {
-      margin-bottom: 15px;
+
+    h2 {
+      color: #e53935;
     }
+
+    .qr {
+      margin: 20px 0;
+    }
+
+    .qr img {
+      width: 250px;
+      height: auto;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .info {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+
     button {
-      background-color: #28a745;
+      background-color: #e53935;
       color: white;
+      padding: 12px 20px;
       border: none;
-      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
-    }
-    .status {
       margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #c62828;
+    }
+
+    #status {
+      margin-top: 15px;
       font-weight: bold;
-      color: #ff6600;
+      color: green;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Nạp Tiền Tự Động</h2>
-    <p><b>Chuyển khoản đến:</b></p>
-    <ul>
-      <li>Ngân hàng: MB Bank</li>
-      <li>Số tài khoản: <b>0977049795</b></li>
-      <li>Chủ tài khoản: Dinh Hong Hanh</li>
-    </ul>
-    <p><b>Nội dung chuyển khoản (bắt buộc):</b></p>
-    <p id="ndck" style="color:red;font-weight:bold;"></p>
+    <h2>🔰 Nạp Tiền Vào Tài Khoản</h2>
 
-    <button onclick="daChuyenKhoan()">Tôi đã chuyển khoản</button>
+    <div class="qr">
+      <!-- Thay QR code thật của bạn ở đây -->
+      <img src="https://api.vietqr.io/image/MB/0977049795-compact2.png?amount=0&addInfo=UID1234" alt="QR Code" />
+    </div>
 
-    <div class="status" id="statusText"></div>
+    <div class="info">💳 STK: <b>0977049795</b> (MB Bank)</div>
+    <div class="info">👤 Chủ tài khoản: <b>Dinh Hong Hanh</b></div>
+    <div class="info">📝 Nội dung chuyển khoản: <b id="ndck">UID1234</b></div>
+
+    <button onclick="testGhiFirebase()">🔥 Test ghi Firebase</button>
+    <div id="status"></div>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <!-- Firebase config -->
   <script>
-    // Lấy nội dung chuyển khoản từ localStorage
-    let uid = localStorage.getItem("userUID") || "unknown";
-    let content = "NAP-" + uid;
-    document.getElementById("ndck").innerText = content;
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.firebasestorage.app",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
+    };
 
-    function daChuyenKhoan() {
-      const giaoDichData = {
-        uid: uid,
-        noidung: content,
-        time: new Date().toLocaleString(),
-        trangthai: "Đang chờ"
-      };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+  </script>
 
-      // Gửi dữ liệu lên Firebase
-      firebase.database().ref("giaodich/" + uid).set(giaoDichData)
-        .then(() => {
-          document.getElementById("statusText").innerText = "✔️ Đã gửi yêu cầu! Đang chờ admin duyệt...";
-        })
-        .catch((err) => {
-          document.getElementById("statusText").innerText = "❌ Lỗi gửi giao dịch: " + err.message;
-        });
+  <!-- Test gửi Firebase -->
+  <script>
+    function testGhiFirebase() {
+      const noiDung = document.getElementById("ndck").innerText || "UID1234";
+      const thoiGian = new Date().toLocaleString();
+
+      database.ref("testGiaoDich").push({
+        uid: noiDung,
+        note: "Test giao dịch từ web",
+        time: thoiGian
+      }).then(() => {
+        document.getElementById("status").innerText = "✅ Gửi thành công lên Firebase!";
+      }).catch((err) => {
+        document.getElementById("status").innerText = "❌ Lỗi: " + err.message;
+      });
     }
   </script>
 </body>
