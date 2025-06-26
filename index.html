@@ -3,33 +3,187 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GKDM SHOP - Bán Acc Uy Tín</title>
-  <link rel="stylesheet" href="style.css">
+  <title>GKDM SHOP - Bán Acc Free Fire Uy Tín</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 1px;
+    }
+    nav {
+      background: #fff;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+    nav a:hover {
+      color: #ff4b2b;
+    }
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .section h2 {
+      margin-top: 0;
+      color: #ff4b2b;
+    }
+    .top-nap table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .top-nap th, .top-nap td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .danh-muc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+    .acc-card {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    .acc-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .acc-card img {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+    .acc-card p {
+      margin: 8px 0;
+    }
+    .acc-card button {
+      background: #ff4b2b;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .menu-mobile {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #fff;
+      border: 2px solid #ff4b2b;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .menu-mobile .fa-bars {
+      font-size: 22px;
+      color: #ff4b2b;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #222;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
+
   <header>
-    <h1>GKDM SHOP</h1>
-    <nav>
-      <a href="index.html">Trang chủ</a>
-      <a href="naptien.html">Nạp tiền</a>
-      <a href="admin.html">Admin</a>
-      <a href="loginkhach.html">Tài khoản</a>
-    </nav>
+    <h1>GKDM SHOP - BÁN ACC FREE FIRE</h1>
   </header>
 
-  <main>
-    <h2>TOP NẠP</h2>
-    <ul id="topnap"></ul>
+  <nav>
+    <a href="index.html">Trang chủ</a>
+    <a href="naptien.html">Nạp tiền</a>
+    <a href="admin.html">Admin</a>
+    <a href="loginkhach.html">Tài khoản</a>
+  </nav>
 
-    <h2>DANH MỤC ACC FREE FIRE</h2>
-    <div class="acc-list">
-      <div class="acc-item">Acc 1 - 100k</div>
-      <div class="acc-item">Acc 2 - 150k</div>
+  <div class="container">
+    <div class="section top-nap">
+      <h2>🏆 Top Nạp Tiền</h2>
+      <table>
+        <tr><th>Hạng</th><th>Người dùng</th><th>Số tiền</th></tr>
+        <tr><td>1</td><td>PlayerA</td><td>500.000đ</td></tr>
+        <tr><td>2</td><td>PlayerB</td><td>300.000đ</td></tr>
+        <tr><td>3</td><td>PlayerC</td><td>200.000đ</td></tr>
+      </table>
     </div>
-  </main>
+
+    <div class="section danh-muc">
+      <h2>🎮 Danh Mục Acc Free Fire</h2>
+
+      <div class="acc-card">
+        <img src="https://via.placeholder.com/150" alt="Acc Free Fire" />
+        <p>Acc Free Fire VIP #1</p>
+        <p>Giá: 200.000đ</p>
+        <button>Mua ngay</button>
+      </div>
+
+      <div class="acc-card">
+        <img src="https://via.placeholder.com/150" alt="Acc Free Fire" />
+        <p>Acc Free Fire VIP #2</p>
+        <p>Giá: 150.000đ</p>
+        <button>Mua ngay</button>
+      </div>
+
+      <div class="acc-card">
+        <img src="https://via.placeholder.com/150" alt="Acc Free Fire" />
+        <p>Acc Free Fire VIP #3</p>
+        <p>Giá: 100.000đ</p>
+        <button>Mua ngay</button>
+      </div>
+
+      <!-- Thêm acc tiếp -->
+    </div>
+  </div>
+
+  <div class="menu-mobile" onclick="alert('Menu sắp ra mắt!')">
+    <i class="fas fa-bars"></i>
+  </div>
 
   <footer>
-    <p>&copy; 2025 GKDM SHOP - Bản quyền thuộc về bạn</p>
+    &copy; 2025 GKDM Shop. All rights reserved.
   </footer>
+
 </body>
 </html>
