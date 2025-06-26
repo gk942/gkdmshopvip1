@@ -2,27 +2,77 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Nạp Tiền | GKDM Shop</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nạp tiền - GKDM Shop</title>
   <style>
-    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
-    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-    input, button { width: 100%; padding: 10px; margin: 10px 0; }
-    #status { color: green; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      max-width: 400px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .qr {
+      width: 200px;
+      margin: 10px auto;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .status {
+      margin-top: 15px;
+      color: green;
+      font-weight: bold;
+    }
+
+    .uid-box {
+      font-weight: bold;
+      font-size: 18px;
+      margin: 10px 0;
+      background: #eee;
+      padding: 10px;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
+
   <div class="container">
-    <h2>Nạp Tiền Tự Động</h2>
-    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
+    <h2>💰 Nạp tiền vào tài khoản</h2>
     <p><strong>Ngân hàng:</strong> MB Bank</p>
+    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
     <p><strong>Số tài khoản:</strong> 0977049795</p>
-    <p><strong>Nội dung chuyển khoản:</strong> <span id="paymentCode"></span></p>
-    
+
+    <img src="https://img.vietqr.io/image/MB-0977049795-print.png?amount=0&addInfo=UID1234&accountName=Dinh%20Hong%20Hanh" alt="QR Code" class="qr">
+
+    <p><strong>Nội dung chuyển khoản:</strong></p>
+    <div class="uid-box" id="paymentCode"></div>
+
     <button onclick="sendTransaction()">Bấm vào đây nếu bạn đã bank</button>
-    <p id="status"></p>
+    <div class="status" id="status"></div>
   </div>
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script>
@@ -34,21 +84,28 @@
       messagingSenderId: "52437838526",
       appId: "1:52437838526:web:3187795557aa1458190cef"
     };
+
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    const uid = Math.random().toString(36).substring(2, 10);
-    document.getElementById('paymentCode').innerText = uid;
+    const uid = Math.random().toString(36).substring(2, 10).toUpperCase();
+    document.getElementById("paymentCode").innerText = uid;
 
     function sendTransaction() {
       const timestamp = new Date().toISOString();
+
       const data = {
-        uid,
+        uid: uid,
         status: "Đang chờ",
         time: timestamp
       };
-      database.ref("transactions/" + uid).set(data, () => {
-        document.getElementById('status').innerText = "Đã gửi yêu cầu nạp, vui lòng chờ admin duyệt.";
+
+      database.ref("transactions/" + uid).set(data, function(error) {
+        if (error) {
+          document.getElementById("status").innerText = "Lỗi gửi yêu cầu. Vui lòng thử lại.";
+        } else {
+          document.getElementById("status").innerText = "Đã gửi yêu cầu nạp, vui lòng chờ admin duyệt.";
+        }
       });
     }
   </script>
