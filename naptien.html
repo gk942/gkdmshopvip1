@@ -5,18 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nạp tiền - Shop Acc</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f9f9f9; }
-    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
-    h2 { text-align: center; }
-    .qr { text-align: center; margin: 20px 0; }
-    .status { margin-top: 20px; font-weight: bold; text-align: center; color: green; }
-    button { width: 100%; padding: 10px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #0056b3; }
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    .qr {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .status {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Nạp tiền qua QR</h2>
+    <h2>Nạp tiền vào tài khoản</h2>
     <p><strong>Ngân hàng:</strong> MB Bank</p>
     <p><strong>Số tài khoản:</strong> 0977049795</p>
     <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
@@ -26,8 +57,7 @@
       <img src="https://img.vietqr.io/image/mbbank-0977049795-compact.png?accountName=DINH%20HONG%20HANH" width="250" />
     </div>
 
-    <button onclick="xacNhanChuyenKhoan()">Tôi đã chuyển khoản</button>
-
+    <button onclick="guiGiaoDich()">Tôi đã chuyển khoản</button>
     <div class="status" id="trangthai"></div>
   </div>
 
@@ -46,32 +76,32 @@
       messagingSenderId: "52437838526",
       appId: "1:52437838526:web:3187795557aa1458190cef"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
 
-    // Tạo nội dung chuyển khoản ngẫu nhiên cho khách
-    const uid = "UID" + Math.floor(Math.random() * 100000);
+    // Khởi tạo Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Tạo UID giao dịch
+    const uid = "UID" + Math.floor(Math.random() * 1000000);
     document.getElementById("noidung").innerText = uid;
 
-    // Hàm xác nhận
-    function xacNhanChuyenKhoan() {
-      const now = new Date();
+    function guiGiaoDich() {
+      const thoigian = new Date().toLocaleString();
       const data = {
         uid: uid,
         trangthai: "Đang chờ",
-        thoigian: now.toLocaleString()
+        thoigian: thoigian
       };
 
-      db.ref("giaodich/" + uid).set(data, (error) => {
-        const status = document.getElementById("trangthai");
-        if (error) {
-          status.innerText = "❌ Lỗi gửi giao dịch. Vui lòng thử lại.";
-          status.style.color = "red";
-        } else {
-          status.innerText = "✅ Đã gửi giao dịch. Đợi admin duyệt tiền.";
-          status.style.color = "green";
-        }
-      });
+      database.ref("giaodich/" + uid).set(data)
+        .then(() => {
+          document.getElementById("trangthai").innerText = "✅ Đã gửi. Đợi admin duyệt tiền...";
+          document.getElementById("trangthai").style.color = "green";
+        })
+        .catch((err) => {
+          document.getElementById("trangthai").innerText = "❌ Lỗi gửi dữ liệu: " + err.message;
+          document.getElementById("trangthai").style.color = "red";
+        });
     }
   </script>
 </body>
