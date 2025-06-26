@@ -1,73 +1,31 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nạp Tiền | GKDM SHOP</title>
+  <meta charset="UTF-8">
+  <title>Nạp Tiền | GKDM Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f8f8f8;
-    }
-    .container {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 500px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: #333;
-    }
-    .qr {
-      text-align: center;
-    }
-    .qr img {
-      max-width: 100%;
-    }
-    button {
-      display: block;
-      margin: 20px auto;
-      padding: 12px 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #status {
-      text-align: center;
-      color: green;
-      font-weight: bold;
-      margin-top: 15px;
-    }
+    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    input, button { width: 100%; padding: 10px; margin: 10px 0; }
+    #status { color: green; font-weight: bold; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Thông tin chuyển khoản</h2>
+    <h2>Nạp Tiền Tự Động</h2>
+    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
     <p><strong>Ngân hàng:</strong> MB Bank</p>
     <p><strong>Số tài khoản:</strong> 0977049795</p>
-    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-    <p><strong>Nội dung:</strong> NAP + TÊN ĐĂNG NHẬP (ví dụ: <code>NAP user123</code>)</p>
-
-    <div class="qr">
-      <img src="link-qr-mbbank-cua-ban.png" alt="QR chuyển khoản">
-    </div>
-
-    <button onclick="xacNhanDaBank()">Bấm vào đây nếu bạn đã bank</button>
+    <p><strong>Nội dung chuyển khoản:</strong> <span id="paymentCode"></span></p>
+    
+    <button onclick="sendTransaction()">Bấm vào đây nếu bạn đã bank</button>
     <p id="status"></p>
   </div>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
       authDomain: "gkdmshop.firebaseapp.com",
@@ -78,43 +36,21 @@
     };
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-  </script>
 
-  <script>
-    function xacNhanDaBank() {
-      const user = firebase.auth().currentUser;
-      if (!user) {
-        alert("Bạn cần đăng nhập trước khi xác nhận đã chuyển khoản.");
-        return;
-      }
+    const uid = Math.random().toString(36).substring(2, 10);
+    document.getElementById('paymentCode').innerText = uid;
 
-      const uid = user.uid;
-      const username = user.email || "Không rõ";
-      const time = new Date().toLocaleString();
-
-      const giaoDich = {
-        uid: uid,
-        email: username,
-        time: time,
-        status: "Đang chờ"
+    function sendTransaction() {
+      const timestamp = new Date().toISOString();
+      const data = {
+        uid,
+        status: "Đang chờ",
+        time: timestamp
       };
-
-      // Đẩy giao dịch lên Firebase
-      database.ref("transactions").push(giaoDich)
-        .then(() => {
-          document.getElementById("status").innerText = "✔️ Giao dịch đã được gửi, đang đợi admin duyệt...";
-        })
-        .catch((err) => {
-          alert("Lỗi khi gửi giao dịch: " + err.message);
-        });
+      database.ref("transactions/" + uid).set(data, () => {
+        document.getElementById('status').innerText = "Đã gửi yêu cầu nạp, vui lòng chờ admin duyệt.";
+      });
     }
-
-    // Tự động đăng nhập lại nếu đã login trước đó
-    firebase.auth().onAuthStateChanged((user) => {
-      if (!user) {
-        console.log("Người dùng chưa đăng nhập");
-      }
-    });
   </script>
 </body>
 </html>
