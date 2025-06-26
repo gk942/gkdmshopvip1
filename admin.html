@@ -2,88 +2,142 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin - Duyệt Giao Dịch</title>
-  <script src="firebase.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Duyệt Giao Dịch</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f1f1;
       padding: 20px;
+      text-align: center;
     }
-    .container {
-      max-width: 800px;
+    .login-box, .admin-box {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #aaa;
+      max-width: 500px;
       margin: auto;
+      margin-bottom: 30px;
     }
-    .giao-dich {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+    }
+    th {
+      background: #333;
+      color: white;
     }
     button {
-      padding: 5px 10px;
-      background: #007bff;
+      padding: 6px 12px;
+      background: green;
       color: white;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
     }
-    #login-section {
-      text-align: center;
-      margin-top: 100px;
+    button:disabled {
+      background: gray;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="admin-section" style="display:none;">
-    <h2>Danh sách giao dịch đang chờ</h2>
-    <div id="giaoDichList"></div>
+  <div class="login-box" id="login-box">
+    <h2>🔒 Nhập mật khẩu admin</h2>
+    <input type="password" id="adminPass" placeholder="Mật khẩu admin..." />
+    <br /><br />
+    <button onclick="checkPassword()">Đăng nhập</button>
+    <p id="wrongPass" style="color:red;"></p>
   </div>
 
-  <div id="login-section">
-    <h3>Nhập mật khẩu Admin để truy cập</h3>
-    <input type="password" id="adminPass" placeholder="Mật khẩu..." />
-    <button onclick="kiemTraAdmin()">Đăng nhập</button>
+  <div class="admin-box" id="admin-box" style="display:none;">
+    <h2>📋 Danh sách giao dịch</h2>
+    <table id="gdTable">
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>Thời gian</th>
+          <th>Trạng thái</th>
+          <th>Duyệt</th>
+        </tr>
+      </thead>
+      <tbody id="gdBody">
+        <!-- Dữ liệu Firebase sẽ đẩy vào đây -->
+      </tbody>
+    </table>
   </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
   <script>
-    function kiemTraAdmin() {
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.firebasestorage.app",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Kiểm tra mật khẩu
+    function checkPassword() {
       const pass = document.getElementById("adminPass").value;
       if (pass === "Maka26042006") {
-        document.getElementById("admin-section").style.display = "block";
-        document.getElementById("login-section").style.display = "none";
-        taiGiaoDich();
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("admin-box").style.display = "block";
+        loadGiaoDich();
       } else {
-        alert("Sai mật khẩu admin!");
+        document.getElementById("wrongPass").innerText = "❌ Sai mật khẩu!";
       }
     }
 
-    function taiGiaoDich() {
-      const ref = firebase.database().ref("giaodich");
-      ref.on("value", (snapshot) => {
-        const data = snapshot.val();
-        const list = document.getElementById("giaoDichList");
-        list.innerHTML = "";
-        for (let uid in data) {
-          const item = data[uid];
-          const box = document.createElement("div");
-          box.className = "giao-dich";
-          box.innerHTML = `
-            <p><b>UID:</b> ${uid}</p>
-            <p><b>Nội dung CK:</b> ${item.noidung}</p>
-            <p><b>Thời gian:</b> ${item.time}</p>
-            <p><b>Trạng thái:</b> ${item.trangthai}</p>
-            ${
-              item.trangthai !== "Thành công"
-                ? `<button onclick="duyet('${uid}')">Duyệt</button>`
-                : ""
-            }
-          `;
-          list.appendChild(box);
-        }
-      });
-    }
+    function loadGiaoDich() {
+      const body = document.getElementById("gdBody");
+      db.ref("giaodich").on("value", (snapshot) => {
+        body.innerHTML = "";
+        snapshot.forEach((child) => {
+          const data = child.val();
+          const tr = document.createElement("tr");
 
-    function duyet(uid) {
-      firebase.database().ref("giaodich/" + uid + "/trangthai").set("Thành công")
-        .then(() => alert("Đã duyệt giao dịch UID: " + uid));
+          const uid = document.createElement("td");
+          uid.innerText = data.uid;
+
+          const time = document.createElement("td");
+          time.innerText = data.time;
+
+          const status = document.createElement("td");
+          status.innerText = data.trangthai;
+
+          const action = document.createElement("td");
+          const btn = document.createElement("button");
+          btn.innerText = "✅ Duyệt";
+          btn.disabled = data.trangthai === "Thành công";
+
+          btn.onclick = function () {
+            db.ref("giaodich/" + data.uid).update({ trangthai: "Thành công" });
+          };
+
+          action.appendChild(btn);
+
+          tr.appendChild(uid);
+          tr.appendChild(time);
+          tr.appendChild(status);
+          tr.appendChild(action);
+
+          body.appendChild(tr);
+        });
+      });
     }
   </script>
 </body>
