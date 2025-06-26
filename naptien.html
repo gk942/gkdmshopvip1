@@ -1,93 +1,50 @@
-<!-- naptien.html -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nạp Tiền - Shop Free Fire</title>
+  <title>Nạp Tiền - GKDM Shop</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-    }
-    .qr {
-      margin: 20px auto;
-    }
-    .transactions {
-      margin-top: 30px;
-      background: #222;
-      padding: 15px;
-      border-radius: 8px;
-    }
-    .transaction {
-      border-bottom: 1px solid #444;
-      padding: 10px;
-    }
-    .status-pending {
-      color: yellow;
-    }
-    .status-success {
-      color: lime;
-    }
-  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
-  <h1>Nạp Tiền Tự Động</h1>
-  <p>Quét mã QR bên dưới để chuyển khoản</p>
-  <div class="qr">
-    <img src="https://img.vietqr.io/image/MB-0977049795-compact2.png?amount=10000&addInfo=UID1234" width="200" alt="QR MB Bank">
-    <p><b>Chủ TK:</b> Dinh Hong Hanh<br><b>Ngân hàng:</b> MB Bank<br><b>Số tài khoản:</b> 0977049795</p>
-    <p><b>Nội dung:</b> UID1234 (thay bằng UID thật của bạn)</p>
+  <div class="container">
+    <h2>Nạp tiền vào tài khoản</h2>
+    <p>Chuyển khoản đến STK:</p>
+    <b>Số tài khoản:</b> 0977049795<br>
+    <b>Ngân hàng:</b> MB Bank<br>
+    <b>Chủ tài khoản:</b> Dinh Hong Hanh<br>
+    <p><b>Nội dung chuyển khoản:</b> <span id="transferContent"></span></p>
+
+    <button onclick="confirmTransfer()">Bấm vào đây nếu bạn đã bank</button>
+    <p id="status"></p>
   </div>
 
-  <div class="transactions">
-    <h2>Lịch sử giao dịch</h2>
-    <div id="transaction-list">Đang tải...</div>
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
+  <script src="firebase.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
-      authDomain: "gkdmshop.firebaseapp.com",
-      projectId: "gkdmshop",
-      storageBucket: "gkdmshop.appspot.com",
-      messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef",
-      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com/"
-    };
+    // Tạo nội dung chuyển khoản ngẫu nhiên dựa trên UID
+    const userId = localStorage.getItem("userId") || `user_${Date.now()}`;
+    localStorage.setItem("userId", userId);
+    document.getElementById("transferContent").innerText = userId;
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    function confirmTransfer() {
+      const now = new Date();
+      const data = {
+        uid: userId,
+        status: "Đang chờ duyệt",
+        time: now.toLocaleString()
+      };
 
-    const transactionList = document.getElementById("transaction-list");
-
-    firebase.database().ref("transactions").on("value", (snapshot) => {
-      const data = snapshot.val();
-      transactionList.innerHTML = "";
-      if (!data) {
-        transactionList.innerHTML = "Không có giao dịch nào.";
-        return;
-      }
-
-      Object.keys(data).reverse().forEach((key) => {
-        const tx = data[key];
-        const statusClass = tx.status === "success" ? "status-success" : "status-pending";
-        transactionList.innerHTML += `
-          <div class="transaction">
-            <p><b>Người gửi:</b> ${tx.name || "Không rõ"}</p>
-            <p><b>Số tiền:</b> ${tx.amount}đ</p>
-            <p><b>Thời gian:</b> ${tx.time}</p>
-            <p class="${statusClass}"><b>Trạng thái:</b> ${tx.status === "success" ? "Thành công" : "Đang chờ duyệt"}</p>
-          </div>
-        `;
-      });
-    });
+      database.ref("transactions/" + userId).set(data)
+        .then(() => {
+          document.getElementById("status").innerText = "Đã gửi yêu cầu nạp tiền. Vui lòng chờ admin duyệt!";
+        })
+        .catch((error) => {
+          document.getElementById("status").innerText = "Lỗi khi gửi yêu cầu: " + error.message;
+        });
+    }
   </script>
 </body>
 </html>
