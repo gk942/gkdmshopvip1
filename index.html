@@ -3,124 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GKDM Shop - Bán Acc Free Fire</title>
+  <title>GKDM Shop - Bán Acc Uy Tín</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f3f3f3;
-    }
-    header {
-      background-color: #111;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin-left: 20px;
-      font-weight: bold;
-    }
-    .menu {
-      display: flex;
-    }
-    .banner {
-      background-color: #222;
-      color: white;
-      text-align: center;
-      padding: 30px 20px;
-    }
-    .banner h2 {
-      margin: 0;
-    }
-    .content {
-      padding: 20px;
-    }
-    .top-nap, .danh-muc {
-      margin-bottom: 30px;
-    }
-    .box {
-      background: white;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    footer {
-      background-color: #111;
-      color: white;
-      text-align: center;
-      padding: 15px;
-      margin-top: 30px;
-    }
-    .button {
-      background-color: #ff5c5c;
-      color: white;
-      padding: 10px 20px;
-      text-decoration: none;
-      display: inline-block;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
-    .button:hover {
-      background-color: #e64747;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-<header>
-  <h1>GKDM SHOP</h1>
-  <nav class="menu">
-    <a href="index.html">Trang chủ</a>
-    <a href="naptien.html">Nạp tiền</a>
-    <a href="admin.html">Admin</a>
-    <a href="loginkhach.html">Tài khoản</a>
-  </nav>
-</header>
-
-<div class="banner">
-  <h2>Chào mừng đến với shop bán acc Free Fire uy tín!</h2>
-  <p>Giao dịch tự động - Nạp tiền dễ dàng - Bảo mật an toàn</p>
-</div>
-
-<div class="content">
-
-  <div class="top-nap">
-    <h3>🔥 Top Nạp Tiền 🔥</h3>
-    <div class="box">
-      <p>1. Người chơi A - 500.000đ</p>
-      <p>2. Người chơi B - 300.000đ</p>
-      <p>3. Người chơi C - 150.000đ</p>
+  <header>
+    <div class="container">
+      <h1 class="logo">GKDM SHOP</h1>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="active">Trang chủ</a></li>
+          <li><a href="loginkhach.html">Tài khoản</a></li>
+          <li><a href="naptien.html">Nạp tiền</a></li>
+          <li><a href="admin.html">Admin</a></li>
+        </ul>
+      </nav>
     </div>
-  </div>
+  </header>
 
-  <div class="danh-muc">
-    <h3>🎮 Danh Mục Acc Free Fire 🎮</h3>
-    <div class="box">
-      <p>Acc #001 - Rank Thách Đấu - Giá: 200.000đ</p>
-      <a href="#" class="button">Mua ngay</a>
-      <hr>
-      <p>Acc #002 - Có 5 skin súng - Giá: 150.000đ</p>
-      <a href="#" class="button">Mua ngay</a>
-      <hr>
-      <p>Acc #003 - Full pet + Skin - Giá: 100.000đ</p>
-      <a href="#" class="button">Mua ngay</a>
-    </div>
-  </div>
+  <main class="container">
+    <section class="topnap">
+      <h2>TOP NẠP TIỀN</h2>
+      <ul id="top-nap-list">
+        <li>💎 HùngPro - 1.000.000đ</li>
+        <li>🔥 BéBo - 500.000đ</li>
+        <li>⭐ KháchVip - 200.000đ</li>
+      </ul>
+    </section>
 
-</div>
+    <section class="danhmuc">
+      <h2>DANH MỤC ACC FREE FIRE</h2>
+      <div class="acc-grid">
+        <div class="acc-card">
+          <img src="acc1.jpg" alt="Acc FF 1">
+          <h3>Acc Free Fire #1</h3>
+          <p>Giá: 50.000đ</p>
+          <button>Mua ngay</button>
+        </div>
+        <div class="acc-card">
+          <img src="acc2.jpg" alt="Acc FF 2">
+          <h3>Acc Free Fire #2</h3>
+          <p>Giá: 150.000đ</p>
+          <button>Mua ngay</button>
+        </div>
+        <div class="acc-card">
+          <img src="acc3.jpg" alt="Acc FF 3">
+          <h3>Acc Free Fire #3</h3>
+          <p>Giá: 99.000đ</p>
+          <button>Mua ngay</button>
+        </div>
+        <!-- Thêm acc khác ở đây -->
+      </div>
+    </section>
+  </main>
 
-<footer>
-  © 2025 GKDM Shop. All rights reserved.
-</footer>
-
+  <footer>
+    <p>&copy; 2025 GKDM Shop. All rights reserved.</p>
+  </footer>
 </body>
 </html>
