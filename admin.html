@@ -1,100 +1,80 @@
-<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin - Duyệt Giao Dịch</title>
+  <meta charset="UTF-8">
+  <title>Quản lý giao dịch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: Arial;
-      background: #111;
-      color: white;
-      padding: 20px;
-    }
+    body { font-family: Arial; background: #eef2f3; padding: 20px; }
     .hidden { display: none; }
-    .card {
-      background: #222;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 5px 10px;
-      margin-top: 10px;
-    }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    .item { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    button { margin-top: 5px; }
   </style>
 </head>
 <body>
-  <div id="login">
-    <h2>Đăng nhập admin</h2>
-    <input type="password" id="password" placeholder="Nhập mật khẩu"/>
+  <div class="container" id="loginForm">
+    <h2>Đăng nhập Admin</h2>
+    <input type="password" id="adminPass" placeholder="Nhập mật khẩu admin">
     <button onclick="checkPassword()">Đăng nhập</button>
+    <p id="loginStatus" style="color:red;"></p>
   </div>
 
-  <div id="admin-panel" class="hidden">
-    <h2>Giao dịch chờ duyệt</h2>
-    <div id="transactions"></div>
+  <div class="container hidden" id="adminPanel">
+    <h2>Danh sách giao dịch</h2>
+    <div id="transactionList"></div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script>
-    const ADMIN_PASSWORD = "Maka26042006";
-
-    function checkPassword() {
-      const input = document.getElementById("password").value;
-      if (input === ADMIN_PASSWORD) {
-        document.getElementById("login").classList.add("hidden");
-        document.getElementById("admin-panel").classList.remove("hidden");
-        loadTransactions();
-      } else {
-        alert("Sai mật khẩu!");
-      }
-    }
-
     const firebaseConfig = {
       apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
       authDomain: "gkdmshop.firebaseapp.com",
       projectId: "gkdmshop",
       storageBucket: "gkdmshop.appspot.com",
       messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef",
-      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com/"
+      appId: "1:52437838526:web:3187795557aa1458190cef"
     };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const correctPass = "Maka26042006";
+
+    function checkPassword() {
+      const pass = document.getElementById("adminPass").value;
+      if (pass === correctPass) {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("adminPanel").classList.remove("hidden");
+        loadTransactions();
+      } else {
+        document.getElementById("loginStatus").innerText = "Sai mật khẩu!";
+      }
+    }
 
     function loadTransactions() {
-      db.ref("transactions").on("value", (snapshot) => {
-        const data = snapshot.val();
-        const container = document.getElementById("transactions");
-        container.innerHTML = "";
-        if (!data) {
-          container.innerHTML = "Không có giao dịch nào.";
-          return;
-        }
-
-        Object.keys(data).reverse().forEach((key) => {
-          const tx = data[key];
-          if (tx.status === "pending") {
-            const div = document.createElement("div");
-            div.className = "card";
-            div.innerHTML = `
-              <p><b>Người gửi:</b> ${tx.name || "Không rõ"}</p>
-              <p><b>Số tiền:</b> ${tx.amount}</p>
-              <p><b>Thời gian:</b> ${tx.time}</p>
-              <button onclick="duyet('${key}')">Duyệt</button>
-            `;
-            container.appendChild(div);
-          }
+      const list = document.getElementById("transactionList");
+      list.innerHTML = '';
+      database.ref("transactions").on("value", snapshot => {
+        list.innerHTML = '';
+        snapshot.forEach(child => {
+          const data = child.val();
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <strong>UID:</strong> ${data.uid}<br>
+            <strong>Thời gian:</strong> ${data.time}<br>
+            <strong>Trạng thái:</strong> <span id="status-${data.uid}">${data.status}</span><br>
+            ${data.status !== "Thành công" ? `<button onclick="duyet('${data.uid}')">Duyệt</button>` : ''}
+          `;
+          list.appendChild(div);
         });
       });
     }
 
-    function duyet(key) {
-      db.ref("transactions/" + key + "/status").set("success");
-      alert("Đã duyệt giao dịch.");
+    function duyet(uid) {
+      database.ref("transactions/" + uid).update({ status: "Thành công" });
+      document.getElementById("status-" + uid).innerText = "Thành công";
     }
   </script>
 </body>
