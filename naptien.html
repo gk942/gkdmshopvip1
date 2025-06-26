@@ -2,107 +2,114 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Nạp Tiền | Shop Acc Free Fire</title>
+  <title>Nạp Tiền - GKDM Shop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      padding: 20px;
       color: #333;
     }
     .container {
-      max-width: 500px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #0066ff;
-    }
-    .info {
-      background: #e3f2fd;
-      padding: 15px;
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
     }
-    .info p {
-      margin: 8px 0;
-      font-size: 16px;
+    .bank-info {
+      background: #e0f7fa;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 6px;
     }
     .btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: #0066ff;
+      background-color: #2196f3;
       color: white;
+      padding: 10px 15px;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
       cursor: pointer;
-    }
-    .btn:hover {
-      background: #0052cc;
-    }
-    .status {
-      text-align: center;
-      margin-top: 20px;
+      width: 100%;
       font-weight: bold;
     }
+    .btn:disabled {
+      background: gray;
+    }
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="firebase.js"></script> <!-- file cấu hình Firebase thật -->
 </head>
 <body>
   <div class="container">
-    <h2>Nạp Tiền Tự Động</h2>
-
-    <div class="info">
-      <p><strong>Ngân hàng:</strong> MB Bank</p>
-      <p><strong>Số tài khoản:</strong> 0977049795</p>
-      <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-      <p><strong>Nội dung chuyển khoản:</strong> <span id="transferContent"></span></p>
+    <h2>Nạp tiền vào shop</h2>
+    <div class="bank-info">
+      <p><strong>💳 STK:</strong> 0977049795</p>
+      <p><strong>🏦 Ngân hàng:</strong> MB Bank</p>
+      <p><strong>👤 Chủ TK:</strong> Dinh Hong Hanh</p>
     </div>
 
-    <button class="btn" onclick="confirmTransfer()">Tôi đã chuyển khoản</button>
-    <p class="status" id="status"></p>
+    <p><strong>📄 Nội dung chuyển khoản:</strong></p>
+    <input type="text" id="ndck" readonly style="width: 100%; padding: 10px; margin-bottom: 10px;" />
+
+    <button id="xacnhanBtn" class="btn">Bấm vào đây nếu bạn đã bank</button>
+
+    <div class="status" id="statusText"></div>
   </div>
 
-  <script>
-    // Tạo nội dung chuyển khoản ngẫu nhiên và lưu localStorage
-    const uid = localStorage.getItem("uid") || 'khach_' + Math.floor(Math.random() * 100000);
-    localStorage.setItem("uid", uid);
-    const content = "NAP-" + uid;
-    document.getElementById("transferContent").textContent = content;
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    function confirmTransfer() {
-      const now = new Date();
+  <!-- firebase.js cấu hình -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <!-- Script xử lý giao dịch -->
+  <script>
+    // Tạo nội dung chuyển khoản ngẫu nhiên
+    const uid = 'UID' + Math.floor(Math.random() * 1000000);
+    localStorage.setItem('uid_ck', uid);
+    document.getElementById('ndck').value = uid;
+
+    document.getElementById('xacnhanBtn').addEventListener('click', () => {
+      const uidCK = localStorage.getItem('uid_ck');
+      if (!uidCK) {
+        alert("Lỗi: không tìm thấy nội dung chuyển khoản!");
+        return;
+      }
+
       const giaoDich = {
-        uid: uid,
-        noidung: content,
-        trangthai: "Đang chờ",
-        thoigian: now.toLocaleString()
+        uid: uidCK,
+        trangThai: "Đang chờ",
+        time: new Date().toLocaleString()
       };
 
-      firebase.database().ref("giaodich/" + uid).set(giaoDich)
+      firebase.database().ref('giaodich/' + uidCK).set(giaoDich)
         .then(() => {
-          document.getElementById("status").innerText = "✅ Giao dịch đã gửi! Vui lòng đợi admin duyệt.";
+          document.getElementById('statusText').innerText = "🕒 Đang chờ admin duyệt tiền...";
+          document.getElementById('xacnhanBtn').disabled = true;
         })
         .catch((error) => {
-          document.getElementById("status").innerText = "❌ Lỗi gửi giao dịch: " + error.message;
+          alert("Lỗi khi gửi dữ liệu: " + error);
         });
-    }
+    });
   </script>
 </body>
 </html>
