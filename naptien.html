@@ -3,82 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nạp Tiền - GKDM Shop</title>
+  <title>Nạp Tiền - Tự Động Gửi Giao Dịch</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
-      color: #333;
+      background: #f4f6f8;
       padding: 20px;
       text-align: center;
     }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
+    .box {
+      background: white;
       padding: 25px;
       border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 10px #ccc;
+      max-width: 500px;
+      margin: auto;
     }
-
-    h2 {
-      color: #e53935;
-    }
-
-    .qr {
-      margin: 20px 0;
-    }
-
-    .qr img {
+    img {
       width: 250px;
-      height: auto;
-      border: 2px solid #ccc;
       border-radius: 10px;
     }
-
-    .info {
-      font-size: 16px;
-      margin: 10px 0;
-    }
-
-    button {
-      background-color: #e53935;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
+    .status {
       margin-top: 20px;
-    }
-
-    button:hover {
-      background-color: #c62828;
-    }
-
-    #status {
-      margin-top: 15px;
       font-weight: bold;
       color: green;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🔰 Nạp Tiền Vào Tài Khoản</h2>
-
-    <div class="qr">
-      <!-- Thay QR code thật của bạn ở đây -->
-      <img src="https://api.vietqr.io/image/MB/0977049795-compact2.png?amount=0&addInfo=UID1234" alt="QR Code" />
-    </div>
-
-    <div class="info">💳 STK: <b>0977049795</b> (MB Bank)</div>
-    <div class="info">👤 Chủ tài khoản: <b>Dinh Hong Hanh</b></div>
-    <div class="info">📝 Nội dung chuyển khoản: <b id="ndck">UID1234</b></div>
-
-    <button onclick="testGhiFirebase()">🔥 Test ghi Firebase</button>
-    <div id="status"></div>
+  <div class="box">
+    <h2>🔰 Nạp tiền vào tài khoản</h2>
+    <img src="https://api.vietqr.io/image/MB/0977049795-compact2.png?amount=0&addInfo=UID1234" alt="QR Code" />
+    <p><strong>STK:</strong> 0977049795 (MB Bank)</p>
+    <p><strong>Chủ TK:</strong> Dinh Hong Hanh</p>
+    <p><strong>Nội dung CK:</strong> <span id="ndck">UID1234</span></p>
+    <div class="status" id="status">⏳ Đang gửi yêu cầu duyệt...</div>
   </div>
 
   <!-- Firebase SDK -->
@@ -98,25 +57,34 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.database();
   </script>
 
-  <!-- Test gửi Firebase -->
+  <!-- Auto gửi khi load trang -->
   <script>
-    function testGhiFirebase() {
-      const noiDung = document.getElementById("ndck").innerText || "UID1234";
-      const thoiGian = new Date().toLocaleString();
+    const uid = localStorage.getItem("uidkhach") || "UID1234";
+    const statusDiv = document.getElementById("status");
 
-      database.ref("testGiaoDich").push({
-        uid: noiDung,
-        note: "Test giao dịch từ web",
-        time: thoiGian
-      }).then(() => {
-        document.getElementById("status").innerText = "✅ Gửi thành công lên Firebase!";
-      }).catch((err) => {
-        document.getElementById("status").innerText = "❌ Lỗi: " + err.message;
+    // Gửi giao dịch tự động khi load
+    window.onload = function () {
+      const giaoDichRef = db.ref("giaodich/" + uid);
+      giaoDichRef.once("value").then((snapshot) => {
+        if (snapshot.exists()) {
+          statusDiv.innerText = "🟡 Đã gửi, chờ admin duyệt";
+        } else {
+          const data = {
+            uid: uid,
+            time: new Date().toLocaleString(),
+            trangthai: "Đang chờ"
+          };
+          giaoDichRef.set(data).then(() => {
+            statusDiv.innerText = "✅ Đã gửi giao dịch, đợi admin duyệt";
+          }).catch((err) => {
+            statusDiv.innerText = "❌ Lỗi gửi: " + err.message;
+          });
+        }
       });
-    }
+    };
   </script>
 </body>
 </html>
