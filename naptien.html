@@ -2,37 +2,106 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Nạp Tiền - GKDM SHOP</title>
+  <title>Nạp Tiền | Shop Acc Free Fire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #0066ff;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .info p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #0052cc;
+    }
+    .status {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="firebase.js"></script> <!-- file cấu hình Firebase thật -->
 </head>
 <body>
-  <h2>Nạp Tiền</h2>
+  <div class="container">
+    <h2>Nạp Tiền Tự Động</h2>
 
-  <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-  <p><strong>Ngân hàng:</strong> MB Bank</p>
-  <p><strong>Số tài khoản:</strong> 0977049795</p>
+    <div class="info">
+      <p><strong>Ngân hàng:</strong> MB Bank</p>
+      <p><strong>Số tài khoản:</strong> 0977049795</p>
+      <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
+      <p><strong>Nội dung chuyển khoản:</strong> <span id="transferContent"></span></p>
+    </div>
 
-  <div>
-    <p>Nội dung chuyển khoản của bạn là:</p>
-    <p id="noidung">loading...</p>
+    <button class="btn" onclick="confirmTransfer()">Tôi đã chuyển khoản</button>
+    <p class="status" id="status"></p>
   </div>
 
-  <button onclick="xacNhanChuyenKhoan()">Bấm vào đây nếu bạn đã bank</button>
-  <p id="thongbao"></p>
-
-  <script src="firebase.js"></script>
   <script>
-    const uid = localStorage.getItem("uid") || "khach_vang_lai";
-    const noidung = "gkshop_" + uid;
-    document.getElementById("noidung").innerText = noidung;
+    // Tạo nội dung chuyển khoản ngẫu nhiên và lưu localStorage
+    const uid = localStorage.getItem("uid") || 'khach_' + Math.floor(Math.random() * 100000);
+    localStorage.setItem("uid", uid);
+    const content = "NAP-" + uid;
+    document.getElementById("transferContent").textContent = content;
 
-    function xacNhanChuyenKhoan() {
-      const napRef = database.ref("giaodich").push();
-      napRef.set({
+    function confirmTransfer() {
+      const now = new Date();
+      const giaoDich = {
         uid: uid,
-        noidung: noidung,
-        trangthai: "Đang chờ"
-      });
-      document.getElementById("thongbao").innerText = "Đã gửi yêu cầu, đợi admin duyệt.";
+        noidung: content,
+        trangthai: "Đang chờ",
+        thoigian: now.toLocaleString()
+      };
+
+      firebase.database().ref("giaodich/" + uid).set(giaoDich)
+        .then(() => {
+          document.getElementById("status").innerText = "✅ Giao dịch đã gửi! Vui lòng đợi admin duyệt.";
+        })
+        .catch((error) => {
+          document.getElementById("status").innerText = "❌ Lỗi gửi giao dịch: " + error.message;
+        });
     }
   </script>
 </body>
