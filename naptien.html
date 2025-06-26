@@ -1,115 +1,75 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Nạp Tiền - GKDM Shop</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Nạp Tiền - Shop</title>
+  <script src="firebase.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f9;
+      font-family: Arial, sans-serif;
       padding: 20px;
-      color: #333;
     }
     .container {
-      max-width: 400px;
+      max-width: 500px;
       margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
     }
-    .bank-info {
-      background: #e0f7fa;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 6px;
+    .input-group {
+      margin-bottom: 15px;
     }
-    .btn {
-      background-color: #2196f3;
+    button {
+      background-color: #28a745;
       color: white;
-      padding: 10px 15px;
       border: none;
+      padding: 10px 15px;
       cursor: pointer;
-      width: 100%;
-      font-weight: bold;
-    }
-    .btn:disabled {
-      background: gray;
     }
     .status {
-      margin-top: 15px;
+      margin-top: 20px;
       font-weight: bold;
-      text-align: center;
+      color: #ff6600;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Nạp tiền vào shop</h2>
-    <div class="bank-info">
-      <p><strong>💳 STK:</strong> 0977049795</p>
-      <p><strong>🏦 Ngân hàng:</strong> MB Bank</p>
-      <p><strong>👤 Chủ TK:</strong> Dinh Hong Hanh</p>
-    </div>
+    <h2>Nạp Tiền Tự Động</h2>
+    <p><b>Chuyển khoản đến:</b></p>
+    <ul>
+      <li>Ngân hàng: MB Bank</li>
+      <li>Số tài khoản: <b>0977049795</b></li>
+      <li>Chủ tài khoản: Dinh Hong Hanh</li>
+    </ul>
+    <p><b>Nội dung chuyển khoản (bắt buộc):</b></p>
+    <p id="ndck" style="color:red;font-weight:bold;"></p>
 
-    <p><strong>📄 Nội dung chuyển khoản:</strong></p>
-    <input type="text" id="ndck" readonly style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-
-    <button id="xacnhanBtn" class="btn">Bấm vào đây nếu bạn đã bank</button>
+    <button onclick="daChuyenKhoan()">Tôi đã chuyển khoản</button>
 
     <div class="status" id="statusText"></div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-  <!-- firebase.js cấu hình -->
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
-      authDomain: "gkdmshop.firebaseapp.com",
-      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
-      projectId: "gkdmshop",
-      storageBucket: "gkdmshop.appspot.com",
-      messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef"
-    };
+    // Lấy nội dung chuyển khoản từ localStorage
+    let uid = localStorage.getItem("userUID") || "unknown";
+    let content = "NAP-" + uid;
+    document.getElementById("ndck").innerText = content;
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
-
-  <!-- Script xử lý giao dịch -->
-  <script>
-    // Tạo nội dung chuyển khoản ngẫu nhiên
-    const uid = 'UID' + Math.floor(Math.random() * 1000000);
-    localStorage.setItem('uid_ck', uid);
-    document.getElementById('ndck').value = uid;
-
-    document.getElementById('xacnhanBtn').addEventListener('click', () => {
-      const uidCK = localStorage.getItem('uid_ck');
-      if (!uidCK) {
-        alert("Lỗi: không tìm thấy nội dung chuyển khoản!");
-        return;
-      }
-
-      const giaoDich = {
-        uid: uidCK,
-        trangThai: "Đang chờ",
-        time: new Date().toLocaleString()
+    function daChuyenKhoan() {
+      const giaoDichData = {
+        uid: uid,
+        noidung: content,
+        time: new Date().toLocaleString(),
+        trangthai: "Đang chờ"
       };
 
-      firebase.database().ref('giaodich/' + uidCK).set(giaoDich)
+      // Gửi dữ liệu lên Firebase
+      firebase.database().ref("giaodich/" + uid).set(giaoDichData)
         .then(() => {
-          document.getElementById('statusText').innerText = "🕒 Đang chờ admin duyệt tiền...";
-          document.getElementById('xacnhanBtn').disabled = true;
+          document.getElementById("statusText").innerText = "✔️ Đã gửi yêu cầu! Đang chờ admin duyệt...";
         })
-        .catch((error) => {
-          alert("Lỗi khi gửi dữ liệu: " + error);
+        .catch((err) => {
+          document.getElementById("statusText").innerText = "❌ Lỗi gửi giao dịch: " + err.message;
         });
-    });
+    }
   </script>
 </body>
 </html>
