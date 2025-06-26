@@ -1,107 +1,38 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nạp tiền - Shop Acc</title>
-  <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-      background: #f7f7f7;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-    }
-    .qr {
-      text-align: center;
-      margin: 20px 0;
-    }
-    .status {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      background-color: #28a745;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Nạp Tiền - GKDM SHOP</title>
 </head>
 <body>
-  <div class="container">
-    <h2>Nạp tiền vào tài khoản</h2>
-    <p><strong>Ngân hàng:</strong> MB Bank</p>
-    <p><strong>Số tài khoản:</strong> 0977049795</p>
-    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-    <p><strong>Nội dung chuyển khoản:</strong> <span id="noidung"></span></p>
+  <h2>Nạp Tiền</h2>
 
-    <div class="qr">
-      <img src="https://img.vietqr.io/image/mbbank-0977049795-compact.png?accountName=DINH%20HONG%20HANH" width="250" />
-    </div>
+  <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
+  <p><strong>Ngân hàng:</strong> MB Bank</p>
+  <p><strong>Số tài khoản:</strong> 0977049795</p>
 
-    <button onclick="guiGiaoDich()">Tôi đã chuyển khoản</button>
-    <div class="status" id="trangthai"></div>
+  <div>
+    <p>Nội dung chuyển khoản của bạn là:</p>
+    <p id="noidung">loading...</p>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <button onclick="xacNhanChuyenKhoan()">Bấm vào đây nếu bạn đã bank</button>
+  <p id="thongbao"></p>
 
+  <script src="firebase.js"></script>
   <script>
-    // Cấu hình Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
-      authDomain: "gkdmshop.firebaseapp.com",
-      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
-      projectId: "gkdmshop",
-      storageBucket: "gkdmshop.appspot.com",
-      messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef"
-    };
+    const uid = localStorage.getItem("uid") || "khach_vang_lai";
+    const noidung = "gkshop_" + uid;
+    document.getElementById("noidung").innerText = noidung;
 
-    // Khởi tạo Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // Tạo UID giao dịch
-    const uid = "UID" + Math.floor(Math.random() * 1000000);
-    document.getElementById("noidung").innerText = uid;
-
-    function guiGiaoDich() {
-      const thoigian = new Date().toLocaleString();
-      const data = {
+    function xacNhanChuyenKhoan() {
+      const napRef = database.ref("giaodich").push();
+      napRef.set({
         uid: uid,
-        trangthai: "Đang chờ",
-        thoigian: thoigian
-      };
-
-      database.ref("giaodich/" + uid).set(data)
-        .then(() => {
-          document.getElementById("trangthai").innerText = "✅ Đã gửi. Đợi admin duyệt tiền...";
-          document.getElementById("trangthai").style.color = "green";
-        })
-        .catch((err) => {
-          document.getElementById("trangthai").innerText = "❌ Lỗi gửi dữ liệu: " + err.message;
-          document.getElementById("trangthai").style.color = "red";
-        });
+        noidung: noidung,
+        trangthai: "Đang chờ"
+      });
+      document.getElementById("thongbao").innerText = "Đã gửi yêu cầu, đợi admin duyệt.";
     }
   </script>
 </body>
