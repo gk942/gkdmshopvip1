@@ -1,177 +1,140 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Shop Acc Free Fire GKDM</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GKDM Shop - Bán Acc Free Fire</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    /* Reset */
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
     body {
-      background: #121212;
-      color: #eee;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 15px;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
     }
     header {
-      width: 100%;
-      max-width: 900px;
+      background: #222;
+      color: #fff;
+      padding: 10px 15px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #4caf50;
-      padding-bottom: 10px;
+      justify-content: space-between;
     }
     header h1 {
-      font-size: 1.8rem;
-      color: #4caf50;
+      font-size: 20px;
     }
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 20px;
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
     }
-    nav ul li a {
-      color: #eee;
+    .menu {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      display: none;
+      flex-direction: column;
+    }
+    .menu a {
+      padding: 10px;
       text-decoration: none;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 5px;
-      transition: background-color 0.3s;
+      color: #333;
+      border-bottom: 1px solid #eee;
     }
-    nav ul li a:hover, nav ul li a.active {
-      background-color: #4caf50;
-      color: #121212;
+    .menu a:last-child {
+      border-bottom: none;
     }
-    main {
-      width: 100%;
-      max-width: 900px;
-      background: #1f1f1f;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 0 10px #4caf50aa;
+    .top-nap {
+      padding: 15px;
     }
-    section {
-      margin-bottom: 30px;
+    .top-nap h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #333;
     }
-    h2 {
-      color: #4caf50;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #4caf50;
-      padding-bottom: 5px;
+    .acc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      padding: 15px;
     }
-    /* Top Nạp */
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .acc-item {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
     }
-    th, td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #333;
+    .acc-item h3 {
+      font-size: 16px;
+      margin: 0 0 5px;
+    }
+    .acc-item p {
+      margin: 0;
+      color: #555;
+    }
+    .nav-buttons {
       text-align: center;
+      margin-top: 10px;
     }
-    th {
-      background-color: #333;
-    }
-    tbody tr:nth-child(even) {
-      background-color: #222;
-    }
-    tbody tr:hover {
-      background-color: #2e7d32;
-      cursor: pointer;
-      color: #fff;
-    }
-    /* Button */
-    .btn {
+    .nav-buttons a {
       display: inline-block;
-      background-color: #4caf50;
-      color: #121212;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 7px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .btn:hover {
-      background-color: #45a045;
+      margin: 0 10px;
+      padding: 8px 16px;
+      background: #0066ff;
       color: white;
-    }
-    /* Footer */
-    footer {
-      margin-top: 40px;
-      font-size: 0.9rem;
-      color: #888;
-    }
-    @media (max-width: 600px) {
-      nav ul {
-        flex-direction: column;
-        gap: 10px;
-      }
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      border-radius: 6px;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>GKDM Shop Free Fire</h1>
-  <nav>
+  <header>
+    <h1>GKDM SHOP</h1>
+    <div class="menu-icon" onclick="toggleMenu()">☰</div>
+  </header>
+
+  <div class="menu" id="menu">
+    <a href="#">Tài khoản: User123</a>
+    <a href="#">Số dư: 0đ</a>
+    <a href="top-nap.html">Lịch sử nạp</a>
+    <a href="nap-tien.html">Nạp tiền</a>
+    <a href="admin.html">Admin</a>
+  </div>
+
+  <section class="top-nap">
+    <h2>🏆 Bảng Top Nạp</h2>
     <ul>
-      <li><a href="index.html" class="active">Trang chủ</a></li>
-      <li><a href="naptien.html">Nạp tiền</a></li>
-      <li><a href="mua-acc.html">Mua acc</a></li>
-      <li><a href="shop/admin.html">Admin</a></li>
+      <li>1. uservip - 1.000.000đ</li>
+      <li>2. hieu123 - 800.000đ</li>
+      <li>3. thanh98 - 500.000đ</li>
     </ul>
-  </nav>
-</header>
-
-<main>
-  <section id="top-nap">
-    <h2>Top Nạp Tiền</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Hạng</th>
-          <th>Tên người nạp</th>
-          <th>Số tiền (VNĐ)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td>Nguyễn Văn A</td><td>2,000,000</td></tr>
-        <tr><td>2</td><td>Trần Thị B</td><td>1,500,000</td></tr>
-        <tr><td>3</td><td>Phạm Văn C</td><td>1,200,000</td></tr>
-        <tr><td>4</td><td>Võ Thị D</td><td>1,000,000</td></tr>
-        <tr><td>5</td><td>Đinh Văn E</td><td>900,000</td></tr>
-      </tbody>
-    </table>
   </section>
 
-  <section id="mua-acc">
-    <h2>Mua Acc Free Fire</h2>
-    <a href="mua-acc.html" class="btn">Xem danh sách acc</a>
+  <section class="acc-list">
+    <div class="acc-item">
+      <h3>Acc #1</h3>
+      <p>Level 65 | Súng X7 | 200K</p>
+    </div>
+    <div class="acc-item">
+      <h3>Acc #2</h3>
+      <p>Level 70 | Full Pet | 300K</p>
+    </div>
+    <!-- Thêm acc tùy ý -->
   </section>
 
-  <section id="nap-tien">
-    <h2>Nạp Tiền</h2>
-    <a href="naptien.html" class="btn">Nạp tiền ngay</a>
-  </section>
-</main>
+  <div class="nav-buttons">
+    <a href="nap-tien.html">Nạp Tiền</a>
+    <a href="admin.html">Admin</a>
+  </div>
 
-<footer>
-  © 2025 GKDM Shop - Uy tín và chất lượng
-</footer>
+  <script>
+    function toggleMenu() {
+      var menu = document.getElementById('menu');
+      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
 
 </body>
 </html>
