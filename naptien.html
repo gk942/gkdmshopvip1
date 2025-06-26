@@ -1,110 +1,75 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nạp tiền - GKDM Shop</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nạp tiền - Shop Acc</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .container {
-      background: #fff;
-      max-width: 400px;
-      margin: auto;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .qr {
-      width: 200px;
-      margin: 10px auto;
-    }
-
-    button {
-      padding: 10px 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    .status {
-      margin-top: 15px;
-      color: green;
-      font-weight: bold;
-    }
-
-    .uid-box {
-      font-weight: bold;
-      font-size: 18px;
-      margin: 10px 0;
-      background: #eee;
-      padding: 10px;
-      border-radius: 6px;
-    }
+    body { font-family: Arial; padding: 20px; background: #f9f9f9; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+    h2 { text-align: center; }
+    .qr { text-align: center; margin: 20px 0; }
+    .status { margin-top: 20px; font-weight: bold; text-align: center; color: green; }
+    button { width: 100%; padding: 10px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0056b3; }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h2>💰 Nạp tiền vào tài khoản</h2>
+    <h2>Nạp tiền qua QR</h2>
     <p><strong>Ngân hàng:</strong> MB Bank</p>
-    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
     <p><strong>Số tài khoản:</strong> 0977049795</p>
+    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
+    <p><strong>Nội dung chuyển khoản:</strong> <span id="noidung"></span></p>
 
-    <img src="https://img.vietqr.io/image/MB-0977049795-print.png?amount=0&addInfo=UID1234&accountName=Dinh%20Hong%20Hanh" alt="QR Code" class="qr">
+    <div class="qr">
+      <img src="https://img.vietqr.io/image/mbbank-0977049795-compact.png?accountName=DINH%20HONG%20HANH" width="250" />
+    </div>
 
-    <p><strong>Nội dung chuyển khoản:</strong></p>
-    <div class="uid-box" id="paymentCode"></div>
+    <button onclick="xacNhanChuyenKhoan()">Tôi đã chuyển khoản</button>
 
-    <button onclick="sendTransaction()">Bấm vào đây nếu bạn đã bank</button>
-    <div class="status" id="status"></div>
+    <div class="status" id="trangthai"></div>
   </div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
   <script>
+    // Cấu hình Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
       authDomain: "gkdmshop.firebaseapp.com",
+      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
       projectId: "gkdmshop",
       storageBucket: "gkdmshop.appspot.com",
       messagingSenderId: "52437838526",
       appId: "1:52437838526:web:3187795557aa1458190cef"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.database();
 
-    const uid = Math.random().toString(36).substring(2, 10).toUpperCase();
-    document.getElementById("paymentCode").innerText = uid;
+    // Tạo nội dung chuyển khoản ngẫu nhiên cho khách
+    const uid = "UID" + Math.floor(Math.random() * 100000);
+    document.getElementById("noidung").innerText = uid;
 
-    function sendTransaction() {
-      const timestamp = new Date().toISOString();
-
+    // Hàm xác nhận
+    function xacNhanChuyenKhoan() {
+      const now = new Date();
       const data = {
         uid: uid,
-        status: "Đang chờ",
-        time: timestamp
+        trangthai: "Đang chờ",
+        thoigian: now.toLocaleString()
       };
 
-      database.ref("transactions/" + uid).set(data, function(error) {
+      db.ref("giaodich/" + uid).set(data, (error) => {
+        const status = document.getElementById("trangthai");
         if (error) {
-          document.getElementById("status").innerText = "Lỗi gửi yêu cầu. Vui lòng thử lại.";
+          status.innerText = "❌ Lỗi gửi giao dịch. Vui lòng thử lại.";
+          status.style.color = "red";
         } else {
-          document.getElementById("status").innerText = "Đã gửi yêu cầu nạp, vui lòng chờ admin duyệt.";
+          status.innerText = "✅ Đã gửi giao dịch. Đợi admin duyệt tiền.";
+          status.style.color = "green";
         }
       });
     }
