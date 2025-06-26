@@ -3,98 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GKDM Shop - Bán Acc Free Fire Uy Tín</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <title>GKDM Shop - Bán Acc Free Fire</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-    body { background: #f2f2f2; color: #333; }
-    header { background: #111; padding: 15px; display: flex; align-items: center; justify-content: space-between; color: white; }
-    header h1 { font-size: 22px; }
-    nav a { color: white; text-decoration: none; margin: 0 10px; }
-    .banner { background: url('banner.jpg') no-repeat center center / cover; height: 200px; display: flex; align-items: center; justify-content: center; color: white; font-size: 26px; font-weight: bold; }
-    .section { padding: 20px; background: white; margin: 15px auto; max-width: 1000px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .section h2 { margin-bottom: 15px; font-size: 20px; border-left: 5px solid red; padding-left: 10px; }
-    .top-nap table { width: 100%; border-collapse: collapse; }
-    .top-nap th, .top-nap td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-    .acc-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-    .acc-item { background: #fafafa; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
-    .acc-item img { width: 100%; height: 120px; object-fit: cover; border-radius: 5px; }
-    .btn { display: inline-block; margin-top: 10px; padding: 8px 16px; background: #ff4d4d; color: white; border: none; border-radius: 4px; text-decoration: none; }
-    footer { text-align: center; padding: 20px; color: #777; font-size: 14px; }
-    .menu { position: fixed; bottom: 20px; left: 20px; background: #333; color: white; padding: 12px; border-radius: 50%; cursor: pointer; font-size: 18px; }
-    .user-info { text-align: right; padding: 10px; font-size: 14px; color: #555; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+    }
+    header {
+      background-color: #111;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: bold;
+    }
+    .menu {
+      display: flex;
+    }
+    .banner {
+      background-color: #222;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+    .banner h2 {
+      margin: 0;
+    }
+    .content {
+      padding: 20px;
+    }
+    .top-nap, .danh-muc {
+      margin-bottom: 30px;
+    }
+    .box {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    footer {
+      background-color: #111;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+    }
+    .button {
+      background-color: #ff5c5c;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      display: inline-block;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    .button:hover {
+      background-color: #e64747;
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>GKDM Shop</h1>
-  <nav>
+  <h1>GKDM SHOP</h1>
+  <nav class="menu">
     <a href="index.html">Trang chủ</a>
     <a href="naptien.html">Nạp tiền</a>
     <a href="admin.html">Admin</a>
+    <a href="loginkhach.html">Tài khoản</a>
   </nav>
 </header>
 
-<div class="banner">SHOP BÁN ACC FREE FIRE UY TÍN</div>
-
-<div class="user-info" id="user-info">Chưa đăng nhập</div>
-
-<div class="section top-nap">
-  <h2>Top Nạp</h2>
-  <table>
-    <thead>
-      <tr><th>STT</th><th>Tên</th><th>Số tiền</th></tr>
-    </thead>
-    <tbody id="topNap">
-      <tr><td>1</td><td>Nguyễn A</td><td>500.000đ</td></tr>
-      <tr><td>2</td><td>Trần B</td><td>300.000đ</td></tr>
-      <tr><td>3</td><td>Lê C</td><td>200.000đ</td></tr>
-    </tbody>
-  </table>
+<div class="banner">
+  <h2>Chào mừng đến với shop bán acc Free Fire uy tín!</h2>
+  <p>Giao dịch tự động - Nạp tiền dễ dàng - Bảo mật an toàn</p>
 </div>
 
-<div class="section">
-  <h2>Danh Mục Acc Free Fire</h2>
-  <div class="acc-list">
-    <div class="acc-item">
-      <img src="acc1.jpg" alt="Acc FF">
-      <p>Acc VIP - Rank Thách Đấu</p>
-      <p>Giá: 300.000đ</p>
-      <a class="btn" href="#">Mua Ngay</a>
+<div class="content">
+
+  <div class="top-nap">
+    <h3>🔥 Top Nạp Tiền 🔥</h3>
+    <div class="box">
+      <p>1. Người chơi A - 500.000đ</p>
+      <p>2. Người chơi B - 300.000đ</p>
+      <p>3. Người chơi C - 150.000đ</p>
     </div>
-    <div class="acc-item">
-      <img src="acc2.jpg" alt="Acc FF">
-      <p>Acc Ngon - Skin Súng Xịn</p>
-      <p>Giá: 150.000đ</p>
-      <a class="btn" href="#">Mua Ngay</a>
-    </div>
-    <!-- Thêm acc khác ở đây -->
   </div>
-</div>
 
-<div class="menu" onclick="toggleLogin()">☰</div>
+  <div class="danh-muc">
+    <h3>🎮 Danh Mục Acc Free Fire 🎮</h3>
+    <div class="box">
+      <p>Acc #001 - Rank Thách Đấu - Giá: 200.000đ</p>
+      <a href="#" class="button">Mua ngay</a>
+      <hr>
+      <p>Acc #002 - Có 5 skin súng - Giá: 150.000đ</p>
+      <a href="#" class="button">Mua ngay</a>
+      <hr>
+      <p>Acc #003 - Full pet + Skin - Giá: 100.000đ</p>
+      <a href="#" class="button">Mua ngay</a>
+    </div>
+  </div>
+
+</div>
 
 <footer>
   © 2025 GKDM Shop. All rights reserved.
 </footer>
-
-<script>
-  // Kiểm tra đăng nhập từ localStorage
-  const user = localStorage.getItem('username');
-  const userInfo = document.getElementById('user-info');
-  if (user) {
-    userInfo.innerText = `Xin chào, ${user}`;
-  }
-
-  function toggleLogin() {
-    const name = prompt("Nhập tên để đăng nhập:");
-    if (name) {
-      localStorage.setItem('username', name);
-      userInfo.innerText = `Xin chào, ${name}`;
-    }
-  }
-</script>
 
 </body>
 </html>
