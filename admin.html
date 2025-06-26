@@ -1,46 +1,89 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Duyệt Giao Dịch</title>
+  <meta charset="UTF-8" />
+  <title>Admin - Duyệt Giao Dịch</title>
+  <script src="firebase.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    .giao-dich {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 5px 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #login-section {
+      text-align: center;
+      margin-top: 100px;
+    }
+  </style>
 </head>
 <body>
-  <h2>ADMIN - DUYỆT GIAO DỊCH</h2>
+  <div class="container" id="admin-section" style="display:none;">
+    <h2>Danh sách giao dịch đang chờ</h2>
+    <div id="giaoDichList"></div>
+  </div>
 
-  <div id="admin"></div>
-  <div id="list"></div>
+  <div id="login-section">
+    <h3>Nhập mật khẩu Admin để truy cập</h3>
+    <input type="password" id="adminPass" placeholder="Mật khẩu..." />
+    <button onclick="kiemTraAdmin()">Đăng nhập</button>
+  </div>
 
-  <script src="firebase.js"></script>
   <script>
-    const pass = prompt("Nhập mật khẩu admin:");
-    if (pass !== "Maka26042006") {
-      document.body.innerHTML = "<h2>Sai mật khẩu</h2>";
-      throw new Error("Không có quyền truy cập");
+    function kiemTraAdmin() {
+      const pass = document.getElementById("adminPass").value;
+      if (pass === "Maka26042006") {
+        document.getElementById("admin-section").style.display = "block";
+        document.getElementById("login-section").style.display = "none";
+        taiGiaoDich();
+      } else {
+        alert("Sai mật khẩu admin!");
+      }
     }
 
-    const listDiv = document.getElementById("list");
-    const ref = database.ref("giaodich");
-
-    ref.on("value", snapshot => {
-      listDiv.innerHTML = "";
-      snapshot.forEach(child => {
-        const data = child.val();
-        const key = child.key;
-
-        const box = document.createElement("div");
-        box.innerHTML = `
-          <p><strong>UID:</strong> ${data.uid}</p>
-          <p><strong>Nội dung:</strong> ${data.noidung}</p>
-          <p><strong>Trạng thái:</strong> ${data.trangthai}</p>
-          ${data.trangthai === "Đang chờ" ? `<button onclick="duyet('${key}')">Duyệt</button>` : ""}
-          <hr/>
-        `;
-        listDiv.appendChild(box);
+    function taiGiaoDich() {
+      const ref = firebase.database().ref("giaodich");
+      ref.on("value", (snapshot) => {
+        const data = snapshot.val();
+        const list = document.getElementById("giaoDichList");
+        list.innerHTML = "";
+        for (let uid in data) {
+          const item = data[uid];
+          const box = document.createElement("div");
+          box.className = "giao-dich";
+          box.innerHTML = `
+            <p><b>UID:</b> ${uid}</p>
+            <p><b>Nội dung CK:</b> ${item.noidung}</p>
+            <p><b>Thời gian:</b> ${item.time}</p>
+            <p><b>Trạng thái:</b> ${item.trangthai}</p>
+            ${
+              item.trangthai !== "Thành công"
+                ? `<button onclick="duyet('${uid}')">Duyệt</button>`
+                : ""
+            }
+          `;
+          list.appendChild(box);
+        }
       });
-    });
+    }
 
-    function duyet(id) {
-      database.ref("giaodich/" + id).update({ trangthai: "Thành công" });
+    function duyet(uid) {
+      firebase.database().ref("giaodich/" + uid + "/trangthai").set("Thành công")
+        .then(() => alert("Đã duyệt giao dịch UID: " + uid));
     }
   </script>
 </body>
