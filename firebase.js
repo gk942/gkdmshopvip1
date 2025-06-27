@@ -1,6 +1,7 @@
-<<!-- firebase.js -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -10,9 +11,10 @@
     projectId: "gkdmshop",
     storageBucket: "gkdmshop.appspot.com",
     messagingSenderId: "52437838526",
-    appId: "1:52437838526:web:3187795557aa1458190cef"
+    appId: "1:52437838526:web:3187795557aa1458190cef",
+    measurementId: "G-V4QFPWK82L"
   };
 
   firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+  const database = firebase.database();
 </script>
