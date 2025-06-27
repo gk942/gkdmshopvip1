@@ -1,59 +1,39 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Nạp Tiền</title>
+  <meta charset="UTF-8">
+  <title>Nạp tiền</title>
   <script src="firebase.js"></script>
-  <style>
-    body { font-family: Arial; background: #f9f9f9; padding: 20px; }
-    .box { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .qr { text-align: center; margin-bottom: 20px; }
-    .status { margin-top: 15px; font-weight: bold; color: green; text-align: center; }
-    button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
-  </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Nạp tiền qua MB Bank</h2>
-    <div class="qr">
-      <img src="https://img.vietqr.io/image/mb-0977049795-compact.png?amount=0&addInfo=UID1234&accountName=Dinh%20Hong%20Hanh" width="250" />
-    </div>
-    <p><strong>Số tài khoản:</strong> 0977049795 (MB Bank)<br />
-    <strong>Tên:</strong> Dinh Hong Hanh<br />
-    <strong>Nội dung chuyển khoản:</strong> <span id="uidDisplay">Đang lấy UID...</span></p>
+  <h2>Thông tin chuyển khoản</h2>
+  <p>STK: <strong>0977049795</strong></p>
+  <p>Ngân hàng: <strong>MB Bank</strong></p>
+  <p>Chủ TK: <strong>Dinh Hong Hanh</strong></p>
+  <p>Nội dung chuyển khoản: <strong id="noidung"></strong></p>
 
-    <button onclick="guiYeuCau()">Bấm vào đây nếu bạn đã chuyển khoản</button>
-    <div class="status" id="status"></div>
-  </div>
+  <button onclick="xacNhan()">Bấm vào đây nếu bạn đã bank</button>
+  <p id="status"></p>
 
   <script>
-    let currentUser;
+    const uid = localStorage.getItem("uid");
+    if (!uid) {
+      alert("Bạn cần đăng nhập trước!");
+      window.location.href = "loginkhach.html";
+    } else {
+      document.getElementById("noidung").innerText = uid;
+    }
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('uidDisplay').innerText = user.uid;
-      } else {
-        alert("Bạn chưa đăng nhập!");
-        window.location.href = "loginkhach.html";
-      }
-    });
-
-    function guiYeuCau() {
-      if (!currentUser) return alert("Vui lòng đăng nhập!");
-
+    function xacNhan() {
+      const now = new Date().toLocaleString("vi-VN");
       const giaoDich = {
-        uid: currentUser.uid,
-        status: "Đang chờ",
-        timestamp: Date.now()
+        uid: uid,
+        time: now,
+        trangthai: "Đang chờ"
       };
 
-      database.ref("giaodich/" + currentUser.uid).set(giaoDich, (error) => {
-        if (error) {
-          document.getElementById('status').innerText = "Lỗi gửi yêu cầu.";
-        } else {
-          document.getElementById('status').innerText = "Đã gửi yêu cầu. Đợi admin duyệt.";
-        }
+      database.ref("giaodich/" + uid).set(giaoDich).then(() => {
+        document.getElementById("status").innerText = "Yêu cầu nạp đã được gửi. Đợi admin duyệt!";
       });
     }
   </script>
