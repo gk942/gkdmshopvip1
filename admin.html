@@ -2,60 +2,98 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Admin duyệt giao dịch</title>
+  <title>Admin duyệt tiền</title>
   <script src="firebase.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1c1c1c;
+      color: white;
+      padding: 20px;
+    }
+    .hidden { display: none; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      color: black;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    button {
+      padding: 5px 10px;
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: darkgreen;
+    }
+  </style>
 </head>
 <body>
   <h2>Quản lý giao dịch</h2>
-  <input type="password" id="adminpass" placeholder="Nhập mật khẩu admin" />
-  <button onclick="dangNhapAdmin()">Đăng nhập</button>
+  <div id="login">
+    <p>Nhập mật khẩu admin:</p>
+    <input type="password" id="pass">
+    <button onclick="checkPass()">Đăng nhập</button>
+    <p id="loginStatus"></p>
+  </div>
 
-  <div id="banggiaodich" style="display:none;">
-    <table border="1">
+  <div id="adminPanel" class="hidden">
+    <table>
       <thead>
-        <tr><th>UID</th><th>Thời gian</th><th>Trạng thái</th><th>Duyệt</th></tr>
+        <tr>
+          <th>UID</th>
+          <th>Trạng thái</th>
+          <th>Thời gian</th>
+          <th>Duyệt</th>
+        </tr>
       </thead>
-      <tbody id="tbody"></tbody>
+      <tbody id="giaoDichList"></tbody>
     </table>
   </div>
 
   <script>
-    const matkhau = "Maka26042006";
+    const adminPassword = "Maka26042006";
 
-    function dangNhapAdmin() {
-      const nhap = document.getElementById('adminpass').value;
-      if (nhap !== matkhau) {
-        alert("Sai mật khẩu!");
-        return;
+    function checkPass() {
+      const input = document.getElementById("pass").value;
+      if (input === adminPassword) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("adminPanel").classList.remove("hidden");
+        loadGiaoDich();
+      } else {
+        document.getElementById("loginStatus").innerText = "Sai mật khẩu!";
       }
+    }
 
-      document.getElementById("banggiaodich").style.display = "block";
-
-      database.ref("giaodich").on("value", snapshot => {
-        const tbody = document.getElementById("tbody");
-        tbody.innerHTML = "";
-
-        snapshot.forEach(child => {
+    function loadGiaoDich() {
+      const table = document.getElementById("giaoDichList");
+      table.innerHTML = "";
+      firebase.database().ref("giaodich").once("value", (snapshot) => {
+        snapshot.forEach((child) => {
           const data = child.val();
           const row = document.createElement("tr");
-
           row.innerHTML = `
             <td>${data.uid}</td>
-            <td>${data.time}</td>
-            <td id="tt-${data.uid}">${data.trangthai}</td>
-            <td><button onclick="duyet('${data.uid}')">Duyệt</button></td>
+            <td>${data.trangThai}</td>
+            <td>${data.thoiGian}</td>
+            <td>${data.trangThai === "Thành công" ? "✓" : `<button onclick="duyetGiaoDich('${data.uid}')">Duyệt</button>`}</td>
           `;
-          tbody.appendChild(row);
+          table.appendChild(row);
         });
       });
     }
 
-    function duyet(uid) {
-      database.ref("giaodich/" + uid).update({
-        trangthai: "Thành công"
-      }).then(() => {
-        document.getElementById("tt-" + uid).innerText = "Thành công";
-      });
+    function duyetGiaoDich(uid) {
+      firebase.database().ref("giaodich/" + uid).update({ trangThai: "Thành công" })
+        .then(() => loadGiaoDich());
     }
   </script>
 </body>
