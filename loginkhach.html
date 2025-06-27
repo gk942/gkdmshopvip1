@@ -5,78 +5,49 @@
   <title>Đăng nhập khách hàng</title>
   <script src="firebase.js"></script>
   <style>
-    body {
-      background: #121212;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    body { font-family: Arial; background: #f0f0f0; padding: 30px; }
+    .container {
+      background: white; padding: 20px; max-width: 400px;
+      margin: auto; border-radius: 10px; box-shadow: 0 0 10px gray;
     }
-    .form-box {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-      text-align: center;
-    }
-    input {
-      padding: 10px;
-      width: 90%;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-    }
-    button {
-      padding: 10px 20px;
-      background: #4caf50;
-      border: none;
-      color: white;
-      cursor: pointer;
-      margin-top: 10px;
-    }
+    input, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    button { background: #2196f3; color: white; border: none; }
+    button:hover { background: #0d8be0; }
   </style>
 </head>
 <body>
-  <div class="form-box">
-    <h2>Đăng nhập</h2>
-    <input type="email" id="email" placeholder="Email"><br>
-    <input type="password" id="password" placeholder="Mật khẩu"><br>
-    <button onclick="login()">Đăng nhập</button>
-    <button onclick="register()">Đăng ký</button>
+  <div class="container">
+    <h2>👤 Đăng nhập / Đăng ký Khách</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button onclick="login()">🔓 Đăng nhập</button>
+    <button onclick="register()">📝 Đăng ký</button>
     <p id="status"></p>
   </div>
 
   <script>
     function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(user => {
-          document.getElementById("status").innerText = "Đăng nhập thành công!";
-          setTimeout(() => {
-            window.location.href = "naptien.html";
-          }, 1000);
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      auth.signInWithEmailAndPassword(email, pass)
+        .then((userCred) => {
+          localStorage.setItem('uid', userCred.user.uid);
+          document.getElementById('status').innerText = "✅ Đăng nhập thành công!";
+          setTimeout(() => location.href = 'index.html', 1000);
         })
-        .catch(err => {
-          document.getElementById("status").innerText = "Lỗi: " + err.message;
-        });
+        .catch(err => document.getElementById('status').innerText = "❌ " + err.message);
     }
 
     function register() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(user => {
-          document.getElementById("status").innerText = "Đăng ký thành công! Đang chuyển hướng...";
-          setTimeout(() => {
-            window.location.href = "naptien.html";
-          }, 1000);
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then((userCred) => {
+          localStorage.setItem('uid', userCred.user.uid);
+          document.getElementById('status').innerText = "✅ Đăng ký thành công!";
+          setTimeout(() => location.href = 'index.html', 1000);
         })
-        .catch(err => {
-          document.getElementById("status").innerText = "Lỗi đăng ký: " + err.message;
-        });
+        .catch(err => document.getElementById('status').innerText = "❌ " + err.message);
     }
   </script>
 </body>
