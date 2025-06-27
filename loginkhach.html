@@ -3,51 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>Đăng nhập khách hàng</title>
-  <script src="firebase.js"></script>
-  <style>
-    body { font-family: Arial; background: #f0f0f0; padding: 30px; }
-    .container {
-      background: white; padding: 20px; max-width: 400px;
-      margin: auto; border-radius: 10px; box-shadow: 0 0 10px gray;
-    }
-    input, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; }
-    button { background: #2196f3; color: white; border: none; }
-    button:hover { background: #0d8be0; }
-  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      databaseURL: "https://gkdmshop-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
 </head>
 <body>
-  <div class="container">
-    <h2>👤 Đăng nhập / Đăng ký Khách</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Mật khẩu">
-    <button onclick="login()">🔓 Đăng nhập</button>
-    <button onclick="register()">📝 Đăng ký</button>
-    <p id="status"></p>
-  </div>
+  <h2>Đăng nhập khách</h2>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Mật khẩu"><br>
+  <button onclick="dangNhap()">Đăng nhập</button>
+  <button onclick="dangKy()">Đăng ký</button>
 
   <script>
-    function login() {
-      const email = document.getElementById('email').value;
-      const pass = document.getElementById('password').value;
-      auth.signInWithEmailAndPassword(email, pass)
-        .then((userCred) => {
-          localStorage.setItem('uid', userCred.user.uid);
-          document.getElementById('status').innerText = "✅ Đăng nhập thành công!";
-          setTimeout(() => location.href = 'index.html', 1000);
+    function dangKy() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      firebase.auth().createUserWithEmailAndPassword(email, pass)
+        .then(userCredential => {
+          const uid = userCredential.user.uid;
+          localStorage.setItem('uid', uid);
+          alert("✅ Đăng ký thành công!");
+          window.location.href = "index.html";
         })
-        .catch(err => document.getElementById('status').innerText = "❌ " + err.message);
+        .catch(error => {
+          alert("❌ Lỗi: " + error.message);
+        });
     }
 
-    function register() {
-      const email = document.getElementById('email').value;
-      const pass = document.getElementById('password').value;
-      auth.createUserWithEmailAndPassword(email, pass)
-        .then((userCred) => {
-          localStorage.setItem('uid', userCred.user.uid);
-          document.getElementById('status').innerText = "✅ Đăng ký thành công!";
-          setTimeout(() => location.href = 'index.html', 1000);
+    function dangNhap() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      firebase.auth().signInWithEmailAndPassword(email, pass)
+        .then(userCredential => {
+          const uid = userCredential.user.uid;
+          localStorage.setItem('uid', uid);
+          alert("✅ Đăng nhập thành công!");
+          window.location.href = "index.html";
         })
-        .catch(err => document.getElementById('status').innerText = "❌ " + err.message);
+        .catch(error => {
+          alert("❌ Lỗi: " + error.message);
+        });
     }
   </script>
 </body>
