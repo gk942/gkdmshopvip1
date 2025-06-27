@@ -1,44 +1,124 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đăng nhập khách</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background-color: #00ff99;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00cc77;
+    }
+    .toggle {
+      margin-top: 10px;
+      text-align: center;
+      cursor: pointer;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
-  <h2>Đăng nhập hoặc Đăng ký</h2>
+  <div class="form-container">
+    <h2 id="form-title">Đăng nhập</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Mật khẩu" />
+    <button id="actionBtn">Đăng nhập</button>
+    <div class="toggle" id="toggleForm">Chưa có tài khoản? Đăng ký</div>
+  </div>
 
-  <input type="email" id="email" placeholder="Email"><br>
-  <input type="password" id="pass" placeholder="Mật khẩu"><br>
-  <button onclick="login()">Đăng nhập</button>
-  <button onclick="signup()">Đăng ký</button>
-  <p id="status"></p>
-
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef"
+    };
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    function login() {
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("pass").value;
-      auth.signInWithEmailAndPassword(email, pass)
-        .then(user => {
-          localStorage.setItem("uid", user.user.uid);
-          document.getElementById("status").innerText = "Đăng nhập thành công!";
-        })
-        .catch(e => document.getElementById("status").innerText = e.message);
-    }
+    let isLogin = true;
+    const emailInput = document.getElementById('email');
+    const passInput = document.getElementById('password');
+    const btn = document.getElementById('actionBtn');
+    const toggle = document.getElementById('toggleForm');
+    const title = document.getElementById('form-title');
 
-    function signup() {
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("pass").value;
-      auth.createUserWithEmailAndPassword(email, pass)
-        .then(user => {
-          localStorage.setItem("uid", user.user.uid);
-          document.getElementById("status").innerText = "Đăng ký thành công!";
-        })
-        .catch(e => document.getElementById("status").innerText = e.message);
-    }
+    toggle.onclick = () => {
+      isLogin = !isLogin;
+      title.innerText = isLogin ? "Đăng nhập" : "Đăng ký";
+      btn.innerText = isLogin ? "Đăng nhập" : "Đăng ký";
+      toggle.innerText = isLogin ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập";
+    };
+
+    btn.onclick = () => {
+      const email = emailInput.value;
+      const password = passInput.value;
+      if (isLogin) {
+        auth.signInWithEmailAndPassword(email, password)
+          .then(userCredential => {
+            const uid = userCredential.user.uid;
+            localStorage.setItem("uid", uid); // lưu uid
+            alert("Đăng nhập thành công! UID: " + uid);
+            window.location.href = "index.html";
+          })
+          .catch(err => alert("Sai tài khoản hoặc mật khẩu!"));
+      } else {
+        auth.createUserWithEmailAndPassword(email, password)
+          .then(userCredential => {
+            const uid = userCredential.user.uid;
+            localStorage.setItem("uid", uid);
+            alert("Đăng ký thành công! UID: " + uid);
+            window.location.href = "index.html";
+          })
+          .catch(err => alert("Lỗi đăng ký: " + err.message));
+      }
+    };
   </script>
 </body>
 </html>
