@@ -1,15 +1,13 @@
-<!-- Đặt vào đầu <head> -->
-<script type="module">
-  // Import SDK từ Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-  // Cấu hình Firebase
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
     authDomain: "gkdmshop.firebaseapp.com",
-    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+    databaseURL: "https://gkdmshop-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "gkdmshop",
     storageBucket: "gkdmshop.appspot.com",
     messagingSenderId: "52437838526",
@@ -17,15 +15,6 @@
     measurementId: "G-V4QFPWK82L"
   };
 
-  // Khởi tạo Firebase
-  const app = initializeApp(firebaseConfig);
-  window.auth = getAuth(app);
-  window.database = getDatabase(app);
-  window.ref = ref;
-  window.set = set;
-  window.push = push;
-  window.onValue = onValue;
-  window.update = update;
-  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-  window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
 </script>
