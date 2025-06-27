@@ -2,90 +2,60 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Đăng nhập khách</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #00c6ff, #0072ff);
-      color: white;
-      text-align: center;
-      padding: 40px;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    input {
-      width: 90%;
-      max-width: 300px;
-      padding: 10px;
-      margin: 8px;
-      border: none;
-      border-radius: 4px;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #ffcc00;
-      border: none;
-      color: black;
-      font-weight: bold;
-      margin: 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
+  <script src="firebase.js"></script>
 </head>
 <body>
-  <h1>Đăng nhập khách hàng</h1>
+  <h2>Đăng nhập tài khoản khách</h2>
 
-  <div id="auth-section">
-    <input type="email" id="email" placeholder="Email..." /><br/>
-    <input type="password" id="password" placeholder="Mật khẩu..." /><br/>
-    <button onclick="register()">Đăng ký</button>
-    <button onclick="login()">Đăng nhập</button>
-  </div>
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Mật khẩu" />
+  <br />
+  <button onclick="login()">Đăng nhập</button>
+  <button onclick="register()">Đăng ký</button>
+  <button onclick="logout()">Đăng xuất</button>
 
-  <div id="status"></div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-  <!-- Firebase Config -->
-  <script src="firebase.js"></script>
+  <p id="uidText"></p>
 
   <script>
-    function register() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          alert("Đăng ký thành công!");
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          alert("Đăng nhập thành công!");
+          const uid = userCredential.user.uid;
+          localStorage.setItem("uid", uid);
+          document.getElementById('uidText').innerText = "UID của bạn: " + uid;
         })
-        .catch((error) => {
-          alert("Lỗi đăng ký: " + error.message);
-        });
+        .catch(error => alert("Lỗi đăng nhập: " + error.message));
     }
 
-    function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          localStorage.setItem("uid", user.uid);
-          document.getElementById("status").innerText = "Xin chào: " + user.email + "\nUID: " + user.uid;
-          alert("Đăng nhập thành công!");
+    function register() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          alert("Đăng ký thành công!");
+          const uid = userCredential.user.uid;
+          localStorage.setItem("uid", uid);
+          document.getElementById('uidText').innerText = "UID của bạn: " + uid;
         })
-        .catch((error) => {
-          alert("Lỗi đăng nhập: " + error.message);
-        });
+        .catch(error => alert("Lỗi đăng ký: " + error.message));
     }
+
+    function logout() {
+      auth.signOut().then(() => {
+        alert("Đăng xuất thành công!");
+        localStorage.removeItem("uid");
+        document.getElementById('uidText').innerText = "";
+      });
+    }
+
+    window.onload = () => {
+      const uid = localStorage.getItem("uid");
+      if (uid) document.getElementById('uidText').innerText = "UID của bạn: " + uid;
+    };
   </script>
 </body>
 </html>
