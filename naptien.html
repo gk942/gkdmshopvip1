@@ -1,90 +1,87 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nạp Tiền - Tự Động Gửi Giao Dịch</title>
+  <meta charset="UTF-8">
+  <title>Nạp tiền - Shop Bán Acc</title>
+  <script src="firebase.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f6f8;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
       padding: 20px;
-      text-align: center;
     }
-    .box {
+    .container {
       background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
+      padding: 20px;
       max-width: 500px;
       margin: auto;
-    }
-    img {
-      width: 250px;
       border-radius: 10px;
+      box-shadow: 0 0 10px #aaa;
+    }
+    .qr-img {
+      max-width: 100%;
+    }
+    .btn {
+      padding: 10px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn:hover {
+      background-color: #0d8be0;
     }
     .status {
-      margin-top: 20px;
+      margin-top: 10px;
       font-weight: bold;
-      color: green;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>🔰 Nạp tiền vào tài khoản</h2>
-    <img src="https://api.vietqr.io/image/MB/0977049795-compact2.png?amount=0&addInfo=UID1234" alt="QR Code" />
-    <p><strong>STK:</strong> 0977049795 (MB Bank)</p>
-    <p><strong>Chủ TK:</strong> Dinh Hong Hanh</p>
-    <p><strong>Nội dung CK:</strong> <span id="ndck">UID1234</span></p>
-    <div class="status" id="status">⏳ Đang gửi yêu cầu duyệt...</div>
+  <div class="container">
+    <h2>🪙 Nạp tiền vào tài khoản</h2>
+    <p><strong>Ngân hàng:</strong> MB Bank</p>
+    <p><strong>Số tài khoản:</strong> 0977049795</p>
+    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
+    <p><strong>Nội dung chuyển khoản:</strong> <span id="transfer-content">UID1234</span></p>
+    <img class="qr-img" src="https://img.vietqr.io/image/mb-0977049795-print.png?amount=0&addInfo=UID1234&accountName=Dinh%20Hong%20Hanh" alt="QR MBBank">
+
+    <br><br>
+    <button class="btn" onclick="xacNhanNapTien()">Bấm vào đây nếu bạn đã bank</button>
+
+    <p class="status" id="status"></p>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-  <!-- Firebase config -->
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
-      authDomain: "gkdmshop.firebaseapp.com",
-      projectId: "gkdmshop",
-      storageBucket: "gkdmshop.firebasestorage.app",
-      messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef",
-      measurementId: "G-V4QFPWK82L"
-    };
+    function taoUIDNgauNhien() {
+      return 'UID' + Math.floor(100000 + Math.random() * 900000);
+    }
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
+    // Tạo UID nạp tiền và lưu vào localStorage
+    const uid = localStorage.getItem('uid_naptien') || taoUIDNgauNhien();
+    localStorage.setItem('uid_naptien', uid);
+    document.getElementById('transfer-content').innerText = uid;
 
-  <!-- Auto gửi khi load trang -->
-  <script>
-    const uid = localStorage.getItem("uidkhach") || "UID1234";
-    const statusDiv = document.getElementById("status");
+    function xacNhanNapTien() {
+      const uid = localStorage.getItem('uid_naptien') || "ChuaCoUID";
+      const thoigian = new Date().toLocaleString();
 
-    // Gửi giao dịch tự động khi load
-    window.onload = function () {
-      const giaoDichRef = db.ref("giaodich/" + uid);
-      giaoDichRef.once("value").then((snapshot) => {
-        if (snapshot.exists()) {
-          statusDiv.innerText = "🟡 Đã gửi, chờ admin duyệt";
+      document.getElementById('status').innerText = "⏳ Đang gửi yêu cầu duyệt tiền...";
+
+      firebase.database().ref('giaodich/' + uid).set({
+        uid: uid,
+        time: thoigian,
+        status: "Đang chờ duyệt"
+      }, (error) => {
+        if (error) {
+          document.getElementById('status').innerText = "❌ Gửi thất bại, hãy thử lại.";
         } else {
-          const data = {
-            uid: uid,
-            time: new Date().toLocaleString(),
-            trangthai: "Đang chờ"
-          };
-          giaoDichRef.set(data).then(() => {
-            statusDiv.innerText = "✅ Đã gửi giao dịch, đợi admin duyệt";
-          }).catch((err) => {
-            statusDiv.innerText = "❌ Lỗi gửi: " + err.message;
-          });
+          document.getElementById('status').innerText = "✅ Đã gửi yêu cầu. Vui lòng chờ admin duyệt!";
         }
       });
-    };
+    }
   </script>
 </body>
 </html>
