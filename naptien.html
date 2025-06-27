@@ -5,76 +5,59 @@
   <title>Nạp tiền</title>
   <script src="firebase.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #141e30, #243b55);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    .box {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 50px;
-      width: 90%;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; text-align: center; }
+    .box { max-width: 400px; margin: 60px auto; background: #1e1e1e; padding: 20px; border-radius: 10px; }
     button {
-      background: orange;
-      color: black;
-      border: none;
       padding: 10px 20px;
-      margin-top: 15px;
-      font-weight: bold;
-      border-radius: 5px;
+      background: #ff9800;
+      color: white;
+      border: none;
       cursor: pointer;
+      margin-top: 10px;
     }
-    button:hover {
-      background: #ff6600;
+    button:disabled {
+      background: #888;
+      cursor: not-allowed;
     }
+    #status { margin-top: 10px; font-weight: bold; color: #4caf50; }
   </style>
 </head>
 <body>
   <div class="box">
-    <h2>Nội dung chuyển khoản của bạn:</h2>
-    <p id="uidBox">Đang tải...</p>
-    <button onclick="guiYeuCau()">Tôi đã chuyển khoản</button>
-    <p id="status"></p>
+    <h2>Chuyển khoản đến</h2>
+    <p><strong>MB Bank</strong></p>
+    <p>Chủ TK: Dinh Hong Hanh</p>
+    <p>Số TK: 0977049795</p>
+    <p>Nội dung: <span id="uid-content">Đăng nhập để lấy</span></p>
+
+    <button id="sendRequest">Bấm vào đây nếu bạn đã bank</button>
+    <div id="status"></div>
   </div>
 
   <script>
-    const uid = localStorage.getItem("uid");
-    const statusText = document.getElementById("status");
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        const uid = user.uid;
+        document.getElementById("uid-content").innerText = uid;
 
-    if (uid) {
-      document.getElementById("uidBox").innerText = uid;
-    } else {
-      document.getElementById("uidBox").innerText = "Bạn chưa đăng nhập.";
-    }
-
-    function guiYeuCau() {
-      if (!uid) {
-        alert("Bạn cần đăng nhập trước khi gửi yêu cầu.");
-        return;
-      }
-
-      const giaoDich = {
-        uid: uid,
-        trangThai: "Đang chờ",
-        thoiGian: new Date().toLocaleString()
-      };
-
-      firebase.database().ref("giaodich/" + uid).set(giaoDich)
-        .then(() => {
-          statusText.innerText = "Đã gửi yêu cầu duyệt.";
-        })
-        .catch((err) => {
-          statusText.innerText = "Lỗi khi gửi: " + err.message;
+        const sendBtn = document.getElementById("sendRequest");
+        sendBtn.addEventListener("click", () => {
+          const ref = firebase.database().ref("giaodich/" + uid);
+          ref.set({
+            uid: uid,
+            trangthai: "Đang chờ"
+          }).then(() => {
+            document.getElementById("status").innerText = "Đã gửi yêu cầu duyệt!";
+            sendBtn.disabled = true;
+          }).catch((err) => {
+            document.getElementById("status").innerText = "Lỗi: " + err.message;
+          });
         });
-    }
+      } else {
+        document.getElementById("status").innerText = "Vui lòng đăng nhập để thực hiện giao dịch.";
+        document.getElementById("sendRequest").disabled = true;
+      }
+    });
   </script>
 </body>
 </html>
