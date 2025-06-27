@@ -1,77 +1,92 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Đăng nhập khách</title>
+  <meta charset="UTF-8">
+  <title>Đăng Nhập Khách</title>
+  <script src="firebase.js"></script>
   <style>
-    body { font-family: Arial; background: #111; color: #fff; display: flex; flex-direction: column; align-items: center; margin-top: 100px; }
-    input, button { margin: 5px; padding: 10px; font-size: 16px; }
-    .box { border: 1px solid #444; padding: 20px; border-radius: 10px; background: #222; width: 300px; }
-    .note { font-size: 14px; margin-top: 10px; color: #ccc; }
-    .error { color: red; margin-top: 10px; }
-    .loading { margin-top: 10px; color: orange; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #101522;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px;
+    }
+    .form-box {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    input {
+      background: #334155;
+      color: white;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #94a3b8;
+    }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Đăng nhập tài khoản</h2>
-    <input id="email" type="email" placeholder="Email" /><br />
-    <input id="password" type="password" placeholder="Mật khẩu" /><br />
-    <button onclick="dangNhap()">Đăng nhập</button>
-    <div id="dangkybox" class="note">
-      Chưa có tài khoản? <a href="#" onclick="hienDangKy()">Tạo tài khoản tại đây</a>
-    </div>
-
-    <div id="dangky" style="display: none;">
-      <h3>Đăng ký tài khoản</h3>
-      <input id="dk_email" type="email" placeholder="Email" /><br />
-      <input id="dk_password" type="password" placeholder="Mật khẩu" /><br />
-      <button onclick="dangKy()">Tạo tài khoản</button>
-    </div>
-
-    <div id="status" class="loading"></div>
-    <div id="error" class="error"></div>
+  <h2>🔐 Tài khoản khách</h2>
+  <div class="form-box">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button onclick="handleAction()">Đăng nhập / Đăng ký</button>
+    <p id="status" class="note"></p>
   </div>
 
-  <script src="firebase.js"></script>
   <script>
-    function hienDangKy() {
-      document.getElementById("dangky").style.display = "block";
-      document.getElementById("dangkybox").style.display = "none";
-    }
+    function handleAction() {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      const status = document.getElementById('status');
 
-    function dangNhap() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      document.getElementById("status").innerText = "⏳ Đang xử lý...";
-      auth.signInWithEmailAndPassword(email, password)
+      if (!email || !pass) {
+        status.textContent = '❌ Vui lòng nhập đầy đủ thông tin.';
+        return;
+      }
+
+      status.textContent = "⏳ Đang xử lý...";
+
+      auth.signInWithEmailAndPassword(email, pass)
         .then(userCredential => {
-          const user = userCredential.user;
-          localStorage.setItem("user", JSON.stringify({
-            email: user.email,
-            uid: user.uid
-          }));
+          const uid = userCredential.user.uid;
+          localStorage.setItem('user_uid', uid);
           window.location.href = "index.html";
         })
         .catch(error => {
-          document.getElementById("status").innerText = "";
-          document.getElementById("error").innerText = "❌ " + error.message;
-        });
-    }
-
-    function dangKy() {
-      const email = document.getElementById("dk_email").value.trim();
-      const password = document.getElementById("dk_password").value;
-      document.getElementById("status").innerText = "⏳ Đang xử lý...";
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          document.getElementById("status").innerText = "✅ Tạo tài khoản thành công! Hãy đăng nhập.";
-          document.getElementById("dangky").style.display = "none";
-          document.getElementById("dangkybox").style.display = "block";
-        })
-        .catch(error => {
-          document.getElementById("status").innerText = "";
-          document.getElementById("error").innerText = "❌ " + error.message;
+          if (error.code === 'auth/user-not-found') {
+            auth.createUserWithEmailAndPassword(email, pass)
+              .then(userCredential => {
+                const uid = userCredential.user.uid;
+                localStorage.setItem('user_uid', uid);
+                window.location.href = "index.html";
+              })
+              .catch(err => {
+                status.textContent = "❌ Lỗi: " + err.message;
+              });
+          } else {
+            status.textContent = "❌ Firebase: " + error.message;
+          }
         });
     }
   </script>
