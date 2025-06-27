@@ -1,189 +1,174 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GKDM SHOP - Bán Acc Free Fire Uy Tín</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <meta charset="UTF-8">
+  <title>GKDM SHOP - Bán Acc Free Fire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase.js"></script>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
-      color: #333;
+      background-color: #121212;
+      color: white;
     }
     header {
-      background: linear-gradient(to right, #ff416c, #ff4b2b);
-      color: white;
-      padding: 15px 20px;
+      background-color: #0d47a1;
+      padding: 20px;
       text-align: center;
     }
     header h1 {
       margin: 0;
-      font-size: 28px;
-      letter-spacing: 1px;
+      color: #ffcc00;
     }
     nav {
-      background: #fff;
       display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 10px 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+      background-color: #1a1a1a;
     }
     nav a {
+      color: white;
       text-decoration: none;
-      color: #333;
-      font-weight: bold;
-      transition: 0.2s;
+      padding: 8px 15px;
+      background-color: #2e2e2e;
+      border-radius: 5px;
     }
     nav a:hover {
-      color: #ff4b2b;
+      background-color: #0d47a1;
     }
     .container {
       padding: 20px;
-      max-width: 1000px;
-      margin: auto;
     }
-    .section {
-      background: white;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    .top-nap, .acc-list, .taikhoan-info {
+      margin-top: 30px;
     }
-    .section h2 {
-      margin-top: 0;
-      color: #ff4b2b;
-    }
-    .top-nap table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .top-nap th, .top-nap td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-    .danh-muc {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-    }
-    .acc-card {
-      background: #fafafa;
-      border: 1px solid #ddd;
+    .acc-item {
+      background-color: #1e1e1e;
       padding: 15px;
-      text-align: center;
       border-radius: 8px;
-      transition: 0.2s;
+      margin-bottom: 10px;
     }
-    .acc-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    .acc-item h3 {
+      margin: 0;
     }
-    .acc-card img {
-      max-width: 100%;
-      border-radius: 5px;
-    }
-    .acc-card p {
-      margin: 8px 0;
-    }
-    .acc-card button {
-      background: #ff4b2b;
+    .btn {
+      background-color: #ff5722;
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
+      padding: 10px;
+      border-radius: 6px;
       cursor: pointer;
+      margin-top: 10px;
     }
-    .menu-mobile {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: #fff;
-      border: 2px solid #ff4b2b;
+    .btn:hover {
+      background-color: #e64a19;
+    }
+    .taikhoan-info {
+      background-color: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .avatar {
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      background-color: gray;
+      margin-right: 15px;
+    }
+    .info-row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      cursor: pointer;
-      z-index: 1000;
     }
-    .menu-mobile .fa-bars {
-      font-size: 22px;
-      color: #ff4b2b;
-    }
-    footer {
-      text-align: center;
-      padding: 15px;
-      background: #222;
-      color: #ccc;
+    .logout-btn {
+      background-color: #f44336;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>GKDM SHOP - BÁN ACC FREE FIRE</h1>
+    <h1>GKDM SHOP - ACC FREE FIRE</h1>
   </header>
 
   <nav>
     <a href="index.html">Trang chủ</a>
     <a href="naptien.html">Nạp tiền</a>
     <a href="admin.html">Admin</a>
-    <a href="loginkhach.html">Tài khoản</a>
+    <a href="loginkhach.html" id="menu-taikhoan">Tài khoản</a>
   </nav>
 
   <div class="container">
-    <div class="section top-nap">
-      <h2>🏆 Top Nạp Tiền</h2>
-      <table>
-        <tr><th>Hạng</th><th>Người dùng</th><th>Số tiền</th></tr>
-        <tr><td>1</td><td>PlayerA</td><td>500.000đ</td></tr>
-        <tr><td>2</td><td>PlayerB</td><td>300.000đ</td></tr>
-        <tr><td>3</td><td>PlayerC</td><td>200.000đ</td></tr>
-      </table>
+    
+    <!-- TOP NẠP -->
+    <div class="top-nap">
+      <h2>🔥 Top Nạp</h2>
+      <ul>
+        <li>🔥 User1 - 1.000.000đ</li>
+        <li>💎 User2 - 500.000đ</li>
+        <li>🔥 User3 - 300.000đ</li>
+      </ul>
     </div>
 
-    <div class="section danh-muc">
-      <h2>🎮 Danh Mục Acc Free Fire</h2>
-
-      <div class="acc-card">
-        <img src="https://via.placeholder.com/150" alt="Acc Free Fire" />
-        <p>Acc Free Fire VIP #1</p>
-        <p>Giá: 200.000đ</p>
-        <button>Mua ngay</button>
+    <!-- DANH MỤC ACC -->
+    <div class="acc-list">
+      <h2>🎮 Danh mục ACC Free Fire</h2>
+      <div class="acc-item">
+        <h3>Acc Free Fire #001</h3>
+        <p>Rank: Thách đấu | Skin Súng VIP</p>
+        <button class="btn">Mua ngay - 200.000đ</button>
       </div>
-
-      <div class="acc-card">
-        <img src="https://via.placeholder.com/150" alt="Acc Free Fire" />
-        <p>Acc Free Fire VIP #2</p>
-        <p>Giá: 150.000đ</p>
-        <button>Mua ngay</button>
+      <div class="acc-item">
+        <h3>Acc Free Fire #002</h3>
+        <p>Rank: Kim cương | Có AK Rồng Xanh</p>
+        <button class="btn">Mua ngay - 100.000đ</button>
       </div>
-
-      <div class="acc-card">
-        <img src="https://via.placeholder.com/150" alt="Acc Free Fire" />
-        <p>Acc Free Fire VIP #3</p>
-        <p>Giá: 100.000đ</p>
-        <button>Mua ngay</button>
-      </div>
-
-      <!-- Thêm acc tiếp -->
     </div>
+
+    <!-- THÔNG TIN TÀI KHOẢN -->
+    <div class="taikhoan-info" id="taikhoanInfo" style="display: none;">
+      <h2>👤 Thông tin tài khoản</h2>
+      <div class="info-row">
+        <img class="avatar" id="avatar" src="" alt="avatar">
+        <div>
+          <p><strong>Email:</strong> <span id="emailDisplay"></span></p>
+          <p><strong>UID:</strong> <span id="uidDisplay"></span></p>
+          <p><strong>Số dư:</strong> <span id="soduDisplay">0đ</span></p>
+        </div>
+      </div>
+      <button class="btn logout-btn" onclick="dangXuat()">🚪 Đăng xuất</button>
+    </div>
+
   </div>
 
-  <div class="menu-mobile" onclick="alert('Menu sắp ra mắt!')">
-    <i class="fas fa-bars"></i>
-  </div>
+  <script>
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.getElementById("menu-taikhoan").innerText = "Tài khoản ✅";
+        document.getElementById("taikhoanInfo").style.display = "block";
+        document.getElementById("emailDisplay").innerText = user.email;
+        document.getElementById("uidDisplay").innerText = user.uid;
+        document.getElementById("avatar").src = `https://api.dicebear.com/6.x/thumbs/svg?seed=${user.uid.slice(0,6)}`;
 
-  <footer>
-    &copy; 2025 GKDM Shop. All rights reserved.
-  </footer>
+        // Lấy số dư từ Realtime Database nếu có
+        firebase.database().ref('users/' + user.uid + '/sodu').once('value', function(snapshot) {
+          const sodu = snapshot.val() || 0;
+          document.getElementById("soduDisplay").innerText = sodu + "đ";
+        });
+      }
+    });
+
+    function dangXuat() {
+      firebase.auth().signOut().then(() => {
+        location.href = "loginkhach.html";
+      });
+    }
+  </script>
 
 </body>
 </html>
