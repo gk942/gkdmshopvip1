@@ -2,46 +2,60 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Duyệt Giao Dịch</title>
+  <title>Admin duyệt giao dịch</title>
   <script src="firebase.js"></script>
-  <style>
-    body { font-family: Arial; padding: 20px; background: #f0f2f5; }
-    .box { background: white; padding: 20px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h2 { margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
-    button { padding: 5px 10px; background: green; color: white; border: none; border-radius: 5px; cursor: pointer; }
-  </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Admin - Duyệt giao dịch</h2>
-    <div id="banggiaodich">Đang tải...</div>
+  <h2>Quản lý giao dịch</h2>
+  <input type="password" id="adminpass" placeholder="Nhập mật khẩu admin" />
+  <button onclick="dangNhapAdmin()">Đăng nhập</button>
+
+  <div id="banggiaodich" style="display:none;">
+    <table border="1">
+      <thead>
+        <tr><th>UID</th><th>Thời gian</th><th>Trạng thái</th><th>Duyệt</th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
   </div>
 
   <script>
-    const matkhau = prompt("Nhập mật khẩu admin:");
-    if (matkhau !== "Maka26042006") {
-      alert("Sai mật khẩu!");
-      window.location.href = "index.html";
+    const matkhau = "Maka26042006";
+
+    function dangNhapAdmin() {
+      const nhap = document.getElementById('adminpass').value;
+      if (nhap !== matkhau) {
+        alert("Sai mật khẩu!");
+        return;
+      }
+
+      document.getElementById("banggiaodich").style.display = "block";
+
+      database.ref("giaodich").on("value", snapshot => {
+        const tbody = document.getElementById("tbody");
+        tbody.innerHTML = "";
+
+        snapshot.forEach(child => {
+          const data = child.val();
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>${data.uid}</td>
+            <td>${data.time}</td>
+            <td id="tt-${data.uid}">${data.trangthai}</td>
+            <td><button onclick="duyet('${data.uid}')">Duyệt</button></td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
     }
 
-    database.ref("giaodich").on("value", snapshot => {
-      const data = snapshot.val();
-      let html = "<table><tr><th>UID</th><th>Trạng thái</th><th>Hành động</th></tr>";
-      for (let uid in data) {
-        html += `<tr>
-          <td>${uid}</td>
-          <td>${data[uid].status}</td>
-          <td>${data[uid].status === "Đang chờ" ? `<button onclick="duyetGiaoDich('${uid}')">Duyệt</button>` : '✔ Đã duyệt'}</td>
-        </tr>`;
-      }
-      html += "</table>";
-      document.getElementById("banggiaodich").innerHTML = html;
-    });
-
-    function duyetGiaoDich(uid) {
-      database.ref("giaodich/" + uid + "/status").set("Thành công");
+    function duyet(uid) {
+      database.ref("giaodich/" + uid).update({
+        trangthai: "Thành công"
+      }).then(() => {
+        document.getElementById("tt-" + uid).innerText = "Thành công";
+      });
     }
   </script>
 </body>
