@@ -2,83 +2,206 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Shop Bán Acc</title>
+  <title>GKDM Shop - Bán Acc Free Fire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="firebase.js"></script>
   <style>
     body {
-      background: #0f172a;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
     }
-    .top-bar {
+    header {
+      background: #1f1f1f;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      border-bottom: 2px solid #00bcd4;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #2a2a2a;
+      padding: 10px 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+      padding: 8px 15px;
+      border-radius: 6px;
+    }
+    nav a:hover {
+      background: #00bcd4;
+      color: #000;
+    }
+
+    .section {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .top-nap, .danh-muc {
+      margin-bottom: 30px;
+    }
+
+    .acc-card {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      border: 1px solid #444;
     }
-    .menu {
-      display: flex;
-      gap: 10px;
+
+    .acc-card img {
+      width: 80px;
+      border-radius: 6px;
     }
-    a {
-      color: #3b82f6;
-      text-decoration: none;
+
+    .acc-info {
+      flex-grow: 1;
+      margin-left: 15px;
+    }
+
+    .acc-info h4 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .acc-info p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .buy-btn {
+      padding: 10px 15px;
+      background: #00c853;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
       font-weight: bold;
+      cursor: pointer;
     }
-    .user-box {
-      background: #1e293b;
-      padding: 15px;
+
+    .buy-btn:hover {
+      background: #00e676;
+    }
+
+    /* Tài khoản box */
+    .account-box {
+      background: #222;
+      padding: 20px;
       border-radius: 10px;
       margin-top: 20px;
-      display: none;
+      text-align: center;
+      border: 1px solid #555;
     }
+
+    .account-box img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
     .logout-btn {
-      background: #ef4444;
-      color: white;
+      background: #e53935;
+      padding: 10px 20px;
       border: none;
-      padding: 8px;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 6px;
       margin-top: 10px;
-      border-radius: 5px;
       cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #ef5350;
     }
   </style>
 </head>
 <body>
-  <div class="top-bar">
-    <div class="menu">
-      <a href="index.html">Trang chủ</a>
-      <a href="naptien.html">Nạp tiền</a>
-      <a href="admin.html">Admin</a>
-      <a href="loginkhach.html" id="loginLink">Tài khoản</a>
+
+  <header>
+    🎮 GKDM SHOP - ACC FREE FIRE
+  </header>
+
+  <nav>
+    <a href="index.html">Trang chủ</a>
+    <a href="naptien.html">Nạp tiền</a>
+    <a href="admin.html">Admin</a>
+    <a href="loginkhach.html" id="menu-account-link">Tài khoản</a>
+  </nav>
+
+  <div class="section">
+    <div class="top-nap">
+      <h2>🏆 Top Nạp</h2>
+      <ul>
+        <li>Nguyễn Văn A - 500.000đ</li>
+        <li>Trần Thị B - 400.000đ</li>
+        <li>Lê Văn C - 300.000đ</li>
+      </ul>
     </div>
-  </div>
 
-  <h2>🎮 Chào mừng đến với Shop bán acc</h2>
+    <div class="danh-muc">
+      <h2>🔥 Danh mục ACC Free Fire</h2>
+      <div class="acc-card">
+        <img src="https://via.placeholder.com/80" alt="acc">
+        <div class="acc-info">
+          <h4>Acc FF VIP #001</h4>
+          <p>Rank: Thách Đấu | Súng VIP</p>
+        </div>
+        <button class="buy-btn">Mua ngay - 200K</button>
+      </div>
+      <div class="acc-card">
+        <img src="https://via.placeholder.com/80" alt="acc">
+        <div class="acc-info">
+          <h4>Acc FF VIP #002</h4>
+          <p>Rank: Đại Cao Thủ | Skin Súng Hiếm</p>
+        </div>
+        <button class="buy-btn">Mua ngay - 150K</button>
+      </div>
+    </div>
 
-  <div id="userBox" class="user-box">
-    <p><strong>UID:</strong> <span id="uidInfo"></span></p>
-    <p><strong>Số dư:</strong> <span id="balance">0 VNĐ</span></p>
-    <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+    <div id="account-info" style="display:none;"></div>
+
   </div>
 
   <script>
-    const uid = localStorage.getItem('user_uid');
-    if (uid) {
-      document.getElementById('uidInfo').innerText = uid;
-      document.getElementById('loginLink').innerText = "Tài khoản của bạn";
-      document.getElementById('userBox').style.display = 'block';
+    const uid = localStorage.getItem('uid');
+    const email = localStorage.getItem('email');
 
-      firebase.database().ref("giaodich/" + uid).once('value').then(snapshot => {
-        const data = snapshot.val();
-        if (data && data.status === "Thành công") {
-          document.getElementById('balance').innerText = "50.000 VNĐ"; // ví dụ
-        }
-      });
+    const accountInfoDiv = document.getElementById("account-info");
+    const menuAccountLink = document.getElementById("menu-account-link");
+
+    if (uid && email) {
+      menuAccountLink.innerText = "Tài khoản ✔️";
+      accountInfoDiv.innerHTML = `
+        <div class="account-box">
+          <img src="https://i.pravatar.cc/150?u=${uid}" alt="avatar">
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>UID:</strong> ${uid}</p>
+          <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+      `;
+      accountInfoDiv.style.display = "block";
     }
 
     function logout() {
-      localStorage.removeItem('user_uid');
-      window.location.href = "index.html";
+      localStorage.removeItem('uid');
+      localStorage.removeItem('email');
+      window.location.reload();
     }
   </script>
+
 </body>
 </html>
