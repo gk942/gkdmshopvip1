@@ -1,13 +1,14 @@
-<!-- Firebase SDK -->
+<!-- firebase.js -->
+<!-- Firebase SDK Compat -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
     authDomain: "gkdmshop.firebaseapp.com",
-    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",  // ✅ SỬA CHỖ NÀY
+    databaseURL: "https://gkdmshop-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "gkdmshop",
     storageBucket: "gkdmshop.appspot.com",
     messagingSenderId: "52437838526",
@@ -16,5 +17,6 @@
   };
 
   firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
   const database = firebase.database();
 </script>
