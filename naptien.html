@@ -1,42 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Nạp tiền</title>
+  <title>Nạp tiền | GKDM Shop</title>
+  <meta charset="UTF-8">
   <script src="firebase.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      padding: 20px;
+    }
+    .box {
+      background: white;
+      max-width: 500px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 20px;
+      background: #ff5e57;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #e14a45;
+    }
+    #thongbao {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>Thông tin chuyển khoản</h2>
-  <p><strong>Số tài khoản:</strong> 0977049795</p>
-  <p><strong>Ngân hàng:</strong> MB Bank</p>
-  <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-  <p><strong>Nội dung chuyển khoản:</strong> <span id="noidung"></span></p>
+  <div class="box">
+    <h2>Thông tin chuyển khoản</h2>
+    <p><b>Ngân hàng:</b> MB Bank</p>
+    <p><b>Số tài khoản:</b> 0977049795</p>
+    <p><b>Chủ tài khoản:</b> Dinh Hong Hanh</p>
+    <p><b>Nội dung chuyển khoản:</b> <span id="noidung"></span></p>
 
-  <button id="xacnhanBtn">Bấm vào đây nếu bạn đã bank</button>
-  <p id="thongbao"></p>
+    <button id="btnXacNhan">Bấm vào đây nếu bạn đã bank</button>
+    <p id="thongbao"></p>
+  </div>
 
   <script>
-    // Tạo UID giả để test nếu chưa có
-    if (!localStorage.getItem("uid")) {
-      localStorage.setItem("uid", "uid_" + Math.floor(Math.random() * 100000));
+    // Tạo UID cho khách
+    let uid = localStorage.getItem("uid");
+    if (!uid) {
+      uid = "user_" + Math.floor(Math.random() * 1000000);
+      localStorage.setItem("uid", uid);
     }
 
-    const uid = localStorage.getItem("uid");
-    const noiDungCK = "NAP_" + uid;
-    document.getElementById("noidung").textContent = noiDungCK;
+    const noidung = "NAP_" + uid;
+    document.getElementById("noidung").innerText = noidung;
 
-    document.getElementById("xacnhanBtn").addEventListener("click", () => {
-      db.ref("giaodich/" + uid).set({
+    document.getElementById("btnXacNhan").addEventListener("click", function() {
+      const data = {
         uid: uid,
-        noidung: noiDungCK,
+        noidung: noidung,
         trangthai: "Đang chờ",
         thoigian: new Date().toLocaleString()
-      }, (error) => {
-        if (error) {
-          alert("Lỗi gửi giao dịch!");
-        } else {
-          document.getElementById("thongbao").textContent = "✅ Đã gửi yêu cầu duyệt tiền. Vui lòng chờ admin xác nhận.";
-        }
-      });
+      };
+
+      db.ref("giaodich/" + uid).set(data)
+        .then(() => {
+          document.getElementById("thongbao").innerText = "✅ Đã gửi yêu cầu. Vui lòng chờ admin duyệt.";
+        })
+        .catch((err) => {
+          document.getElementById("thongbao").innerText = "❌ Lỗi gửi dữ liệu: " + err.message;
+        });
     });
   </script>
 </body>
