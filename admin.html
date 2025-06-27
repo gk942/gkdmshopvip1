@@ -2,46 +2,43 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - Duyệt giao dịch</title>
-  <script src="firebase.js"></script>
-  <style>
-    body { font-family: Arial; background: #f0f0f0; padding: 30px; }
-    table {
-      width: 100%; border-collapse: collapse;
-      background: white; margin-top: 20px;
-    }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    button { padding: 5px 10px; background: green; color: white; border: none; border-radius: 4px; cursor: pointer; }
-  </style>
+  <title>Admin Duyệt Giao Dịch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h2>📋 Danh sách giao dịch chờ duyệt</h2>
-  <table id="giaodich">
-    <tr><th>UID</th><th>Thời gian</th><th>Trạng thái</th><th>Hành động</th></tr>
-  </table>
+<body class="bg-gray-900 text-white p-6">
+  <h1 class="text-3xl font-bold mb-4">Quản lý giao dịch</h1>
 
-  <script>
-    database.ref("giaodich").on("value", (snapshot) => {
-      const table = document.getElementById("giaodich");
-      table.innerHTML = `<tr><th>UID</th><th>Thời gian</th><th>Trạng thái</th><th>Hành động</th></tr>`;
-      snapshot.forEach((child) => {
-        const data = child.val();
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${data.uid}</td>
-          <td>${data.time}</td>
-          <td>${data.status}</td>
-          <td><button onclick="duyet('${data.uid}')">✅ Duyệt</button></td>
+  <div id="giaodich-list" class="space-y-4"></div>
+
+  <script src="firebase.js" type="module"></script>
+  <script type="module">
+    import { firebaseFunctions, db } from './firebase.js';
+
+    const { ref, onValue, update } = firebaseFunctions;
+    const listDiv = document.getElementById("giaodich-list");
+
+    const gdRef = ref(db, "giaodich");
+    onValue(gdRef, (snapshot) => {
+      const data = snapshot.val();
+      listDiv.innerHTML = "";
+      if (!data) return listDiv.innerText = "Không có giao dịch nào.";
+
+      Object.entries(data).forEach(([key, val]) => {
+        const item = document.createElement("div");
+        item.className = "p-4 bg-gray-800 rounded";
+        item.innerHTML = `
+          <p><strong>UID:</strong> ${val.uid}</p>
+          <p><strong>Thời gian:</strong> ${val.time}</p>
+          <p><strong>Trạng thái:</strong> <span id="status-${key}" class="${val.status === 'Thành công' ? 'text-green-400' : 'text-yellow-300'}">${val.status}</span></p>
+          ${val.status === "Đang chờ" ? `<button onclick="duyet('${key}')" class="mt-2 bg-blue-500 px-3 py-1 rounded">Duyệt</button>` : ""}
         `;
-        table.appendChild(row);
+        listDiv.appendChild(item);
       });
     });
 
-    function duyet(uid) {
-      database.ref("giaodich/" + uid).update({
-        status: "Đã duyệt"
-      });
-    }
+    window.duyet = async (id) => {
+      await update(ref(db, "giaodich/" + id), { status: "Thành công" });
+    };
   </script>
 </body>
 </html>
