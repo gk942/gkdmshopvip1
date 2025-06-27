@@ -1,4 +1,4 @@
-<!-- Firebase SDK (CDN dùng cho Auth và Realtime DB) -->
+<!-- Firebase SDK (CDN) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -7,7 +7,7 @@
   const firebaseConfig = {
     apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
     authDomain: "gkdmshop.firebaseapp.com",
-    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com/",
     projectId: "gkdmshop",
     storageBucket: "gkdmshop.appspot.com",
     messagingSenderId: "52437838526",
@@ -15,10 +15,7 @@
     measurementId: "G-V4QFPWK82L"
   };
 
-  // Khởi tạo Firebase
   firebase.initializeApp(firebaseConfig);
-
-  // Khai báo auth & database (RẤT QUAN TRỌNG)
   const auth = firebase.auth();
   const database = firebase.database();
 </script>
