@@ -2,135 +2,176 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Đăng nhập khách hàng</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="firebase.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng nhập / Đăng ký - GKDM Shop</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap">
   <style>
     body {
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
       margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-
-    .box {
+    .container {
       background: #1e1e2f;
       padding: 30px;
       border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      width: 350px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
     }
-
     h2 {
       text-align: center;
       margin-bottom: 20px;
-      color: #ff9800;
     }
-
     input {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin: 10px 0;
       border: none;
       border-radius: 5px;
+      background: #333;
+      color: #fff;
     }
-
     button {
       width: 100%;
-      padding: 10px;
-      background: #ff9800;
-      border: none;
-      color: black;
-      font-weight: bold;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #ffa726;
-    }
-
-    .switch {
-      margin-top: 15px;
-      text-align: center;
-      cursor: pointer;
-      color: #ccc;
-    }
-
-    .switch:hover {
+      padding: 12px;
+      background-color: #ff8c00;
       color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #e67e00;
+    }
+    .switch {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .switch a {
+      color: #00ccff;
+      cursor: pointer;
       text-decoration: underline;
     }
-
-    .message {
+    #message {
       margin-top: 10px;
       text-align: center;
-      font-weight: bold;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2 id="form-title">Đăng nhập</h2>
-    <input type="email" id="email" placeholder="Email..." />
-    <input type="password" id="password" placeholder="Mật khẩu..." />
-    <button id="action-button" onclick="handleAction()">Đăng nhập</button>
-    <div class="switch" onclick="toggleForm()">Chưa có tài khoản? Đăng ký tại đây</div>
-    <div class="message" id="message"></div>
+  <div class="container">
+    <h2 id="formTitle">Đăng nhập</h2>
+    <input type="email" id="email" placeholder="Email đăng nhập" required />
+    <input type="password" id="password" placeholder="Mật khẩu" required />
+    <button id="actionButton">Đăng nhập</button>
+    <div class="switch">
+      <span id="toggleText">Chưa có tài khoản? </span><a id="toggleLink">Đăng ký tại đây</a>
+    </div>
+    <div id="message"></div>
   </div>
 
+  <!-- Firebase SDK compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <!-- Firebase cấu hình -->
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+  </script>
+
+  <!-- Logic đăng nhập / đăng ký -->
+  <script>
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const actionButton = document.getElementById("actionButton");
+    const toggleLink = document.getElementById("toggleLink");
+    const formTitle = document.getElementById("formTitle");
+    const toggleText = document.getElementById("toggleText");
+    const message = document.getElementById("message");
+
     let isLogin = true;
 
-    function toggleForm() {
+    toggleLink.addEventListener("click", () => {
       isLogin = !isLogin;
-      document.getElementById("form-title").innerText = isLogin ? "Đăng nhập" : "Đăng ký";
-      document.getElementById("action-button").innerText = isLogin ? "Đăng nhập" : "Đăng ký";
-      document.querySelector(".switch").innerText = isLogin
-        ? "Chưa có tài khoản? Đăng ký tại đây"
-        : "Đã có tài khoản? Đăng nhập tại đây";
-      document.getElementById("message").innerText = "";
-    }
+      if (isLogin) {
+        formTitle.textContent = "Đăng nhập";
+        actionButton.textContent = "Đăng nhập";
+        toggleText.textContent = "Chưa có tài khoản? ";
+        toggleLink.textContent = "Đăng ký tại đây";
+      } else {
+        formTitle.textContent = "Đăng ký";
+        actionButton.textContent = "Đăng ký";
+        toggleText.textContent = "Đã có tài khoản? ";
+        toggleLink.textContent = "Đăng nhập tại đây";
+      }
+      message.textContent = "";
+    });
 
-    function handleAction() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const messageEl = document.getElementById("message");
+    actionButton.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
 
-      if (email === "" || password === "") {
-        messageEl.innerText = "❌ Vui lòng nhập đầy đủ email và mật khẩu.";
+      if (!email || !password) {
+        message.textContent = "❌ Vui lòng nhập đầy đủ email và mật khẩu.";
         return;
       }
 
-      messageEl.innerText = "⏳ Đang xử lý...";
+      message.textContent = "⏳ Đang xử lý...";
 
-      if (isLogin) {
-        auth.signInWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-            messageEl.innerText = "✅ Đăng nhập thành công!";
-            setTimeout(() => {
-              window.location.href = "index.html";
-            }, 1000);
-          })
-          .catch((error) => {
-            messageEl.innerText = "❌ " + error.message;
+      try {
+        if (isLogin) {
+          const userCredential = await auth.signInWithEmailAndPassword(email, password);
+          const user = userCredential.user;
+          localStorage.setItem("user", JSON.stringify({
+            uid: user.uid,
+            email: user.email
+          }));
+          message.textContent = "✅ Đăng nhập thành công!";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1000);
+        } else {
+          const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+          const user = userCredential.user;
+          await database.ref("users/" + user.uid).set({
+            email: user.email,
+            sodu: 0
           });
-      } else {
-        auth.createUserWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-            messageEl.innerText = "✅ Đăng ký thành công! Vui lòng đăng nhập.";
-            toggleForm();
-          })
-          .catch((error) => {
-            messageEl.innerText = "❌ " + error.message;
-          });
+          message.textContent = "✅ Đăng ký thành công! Vui lòng đăng nhập.";
+          isLogin = true;
+          formTitle.textContent = "Đăng nhập";
+          actionButton.textContent = "Đăng nhập";
+          toggleText.textContent = "Chưa có tài khoản? ";
+          toggleLink.textContent = "Đăng ký tại đây";
+        }
+      } catch (error) {
+        message.textContent = `❌ Lỗi: ${error.message}`;
       }
-    }
+    });
   </script>
 </body>
 </html>
