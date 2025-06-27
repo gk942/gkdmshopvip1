@@ -3,107 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trang Admin | Shop Bán Acc</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Admin - Duyệt Giao Dịch</title>
+  <link rel="stylesheet" href="style.css"/>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #f1f1f1;
-      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #0f172a;
+      color: white;
       padding: 20px;
     }
-    h1 {
-      color: #00ffc8;
+    h2 {
       text-align: center;
+      color: #38bdf8;
     }
-    #adminSection {
-      max-width: 1000px;
-      margin: 20px auto;
-      background-color: #1e1e1e;
+    #loginForm, #adminContent {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #1e293b;
       padding: 20px;
       border-radius: 8px;
     }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px;
+      width: 100%;
+      background-color: #38bdf8;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
     table {
       width: 100%;
+      margin-top: 15px;
       border-collapse: collapse;
-      background-color: #222;
     }
     th, td {
       padding: 10px;
-      border: 1px solid #444;
+      border-bottom: 1px solid #334155;
       text-align: center;
     }
-    th {
-      background-color: #333;
-    }
-    .btn-duyet {
-      background-color: #00ffc8;
-      border: none;
-      color: #000;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .thanhcong {
-      color: #00ff00;
+    .status {
       font-weight: bold;
     }
-    #loginSection {
-      text-align: center;
+    .pending {
+      color: orange;
     }
-    input[type="password"] {
-      padding: 10px;
-      width: 250px;
-      margin-top: 10px;
-      border-radius: 4px;
-      border: 1px solid #555;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #00ffc8;
-      border: none;
-      margin-top: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-weight: bold;
+    .success {
+      color: #22c55e;
     }
   </style>
 </head>
 <body>
-  <h1>Quản Trị Giao Dịch</h1>
+  <h2>🔐 Admin Duyệt Giao Dịch</h2>
 
-  <div id="loginSection">
-    <p>🔒 Nhập mật khẩu admin để truy cập:</p>
-    <input type="password" id="adminPassword" placeholder="Nhập mật khẩu...">
-    <br>
-    <button onclick="checkPassword()">Đăng nhập</button>
+  <div id="loginForm">
+    <input type="password" id="adminPassword" placeholder="Nhập mật khẩu admin..." />
+    <button onclick="checkAdmin()">Đăng nhập admin</button>
+    <p id="loginStatus" style="color: red; text-align: center;"></p>
   </div>
 
-  <div id="adminSection" style="display: none;">
-    <h2>📝 Danh sách giao dịch chờ duyệt</h2>
+  <div id="adminContent" style="display: none;">
+    <h3 style="text-align:center;">📋 Danh sách giao dịch chờ duyệt</h3>
     <table>
       <thead>
         <tr>
           <th>Email</th>
+          <th>Số tiền</th>
           <th>UID</th>
-          <th>Thời gian</th>
-          <th>Nội dung</th>
           <th>Trạng thái</th>
-          <th>Hành động</th>
+          <th>Duyệt</th>
         </tr>
       </thead>
-      <tbody id="giaodichTable">
-        <tr><td colspan="6">⏳ Đang tải dữ liệu...</td></tr>
+      <tbody id="transactionTable">
+        <tr><td colspan="5">⏳ Đang tải dữ liệu...</td></tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
       authDomain: "gkdmshop.firebaseapp.com",
@@ -111,63 +99,58 @@
       projectId: "gkdmshop",
       storageBucket: "gkdmshop.appspot.com",
       messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef",
-      measurementId: "G-V4QFPWK82L"
+      appId: "1:52437838526:web:3187795557aa1458190cef"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    function checkPassword() {
+    const ADMIN_PASSWORD = "Maka26042006"; // bạn có thể thay đổi nếu muốn
+
+    function checkAdmin() {
       const pass = document.getElementById("adminPassword").value;
-      if (pass === "Maka26042006") {
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("adminSection").style.display = "block";
-        loadGiaoDich();
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("adminContent").style.display = "block";
+        loadTransactions();
       } else {
-        alert("❌ Sai mật khẩu admin!");
+        document.getElementById("loginStatus").innerText = "❌ Sai mật khẩu!";
       }
     }
 
-    function loadGiaoDich() {
-      const table = document.getElementById("giaodichTable");
-      const refGD = db.ref("giaodich");
-
-      refGD.on("value", (snapshot) => {
-        const data = snapshot.val();
-        table.innerHTML = ""; // XÓA nội dung cũ
-
-        if (!data) {
-          table.innerHTML = "<tr><td colspan='6'>Không có giao dịch nào.</td></tr>";
+    function loadTransactions() {
+      const tableBody = document.getElementById("transactionTable");
+      const dataRef = ref(db, 'giaodich');
+      onValue(dataRef, (snapshot) => {
+        tableBody.innerHTML = '';
+        if (!snapshot.exists()) {
+          tableBody.innerHTML = `<tr><td colspan="5">❌ Không có giao dịch nào.</td></tr>`;
           return;
         }
+        snapshot.forEach(child => {
+          const uid = child.key;
+          const data = child.val();
+          const row = document.createElement("tr");
 
-        Object.keys(data).forEach(uid => {
-          Object.keys(data[uid]).forEach(maGD => {
-            const gd = data[uid][maGD];
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${gd.email || "Không có"}</td>
-              <td>${uid}</td>
-              <td>${gd.thoigian || ""}</td>
-              <td>${gd.noidung || ""}</td>
-              <td class="${gd.trangthai === 'Thành công' ? 'thanhcong' : ''}">
-                ${gd.trangthai}
-              </td>
-              <td>
-                ${gd.trangthai === 'Đang chờ' ? `<button class="btn-duyet" onclick="duyet('${uid}', '${maGD}')">Duyệt</button>` : '✅'}
-              </td>
-            `;
-            table.appendChild(row);
-          });
+          row.innerHTML = `
+            <td>${data.email || '(không có)'}</td>
+            <td>${data.sotien}</td>
+            <td>${uid}</td>
+            <td class="status ${data.trangthai === 'Thành công' ? 'success' : 'pending'}">${data.trangthai}</td>
+            <td>${data.trangthai === 'Thành công' ? '✅' : `<button onclick="duyetGiaoDich('${uid}')">Duyệt</button>`}</td>
+          `;
+          tableBody.appendChild(row);
         });
       });
     }
 
-    function duyet(uid, maGD) {
-      const refTrangThai = db.ref(`giaodich/${uid}/${maGD}/trangthai`);
-      refTrangThai.set("Thành công");
-      alert("✅ Đã duyệt giao dịch.");
+    window.duyetGiaoDich = function(uid) {
+      const updateRef = ref(db, `giaodich/${uid}`);
+      update(updateRef, {
+        trangthai: "Thành công"
+      }).then(() => {
+        alert("✅ Đã duyệt thành công!");
+      });
     }
   </script>
 </body>
