@@ -4,37 +4,76 @@
   <meta charset="UTF-8">
   <title>Nạp tiền</title>
   <script src="firebase.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 50px;
+      width: 90%;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    button {
+      background: orange;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 15px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff6600;
+    }
+  </style>
 </head>
 <body>
-  <h2>Thông tin chuyển khoản</h2>
-  <p>STK: <strong>0977049795</strong></p>
-  <p>Ngân hàng: <strong>MB Bank</strong></p>
-  <p>Chủ TK: <strong>Dinh Hong Hanh</strong></p>
-  <p>Nội dung chuyển khoản: <strong id="noidung"></strong></p>
-
-  <button onclick="xacNhan()">Bấm vào đây nếu bạn đã bank</button>
-  <p id="status"></p>
+  <div class="box">
+    <h2>Nội dung chuyển khoản của bạn:</h2>
+    <p id="uidBox">Đang tải...</p>
+    <button onclick="guiYeuCau()">Tôi đã chuyển khoản</button>
+    <p id="status"></p>
+  </div>
 
   <script>
     const uid = localStorage.getItem("uid");
-    if (!uid) {
-      alert("Bạn cần đăng nhập trước!");
-      window.location.href = "loginkhach.html";
+    const statusText = document.getElementById("status");
+
+    if (uid) {
+      document.getElementById("uidBox").innerText = uid;
     } else {
-      document.getElementById("noidung").innerText = uid;
+      document.getElementById("uidBox").innerText = "Bạn chưa đăng nhập.";
     }
 
-    function xacNhan() {
-      const now = new Date().toLocaleString("vi-VN");
+    function guiYeuCau() {
+      if (!uid) {
+        alert("Bạn cần đăng nhập trước khi gửi yêu cầu.");
+        return;
+      }
+
       const giaoDich = {
         uid: uid,
-        time: now,
-        trangthai: "Đang chờ"
+        trangThai: "Đang chờ",
+        thoiGian: new Date().toLocaleString()
       };
 
-      database.ref("giaodich/" + uid).set(giaoDich).then(() => {
-        document.getElementById("status").innerText = "Yêu cầu nạp đã được gửi. Đợi admin duyệt!";
-      });
+      firebase.database().ref("giaodich/" + uid).set(giaoDich)
+        .then(() => {
+          statusText.innerText = "Đã gửi yêu cầu duyệt.";
+        })
+        .catch((err) => {
+          statusText.innerText = "Lỗi khi gửi: " + err.message;
+        });
     }
   </script>
 </body>
