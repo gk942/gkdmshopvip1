@@ -1,4 +1,4 @@
-<!-- Firebase SDK dạng compat (phù hợp GitHub Pages) -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -15,10 +15,7 @@
     measurementId: "G-V4QFPWK82L"
   };
 
-  // Khởi tạo Firebase
   firebase.initializeApp(firebaseConfig);
-
-  // Dùng biến auth và database ở mọi trang
   const auth = firebase.auth();
   const database = firebase.database();
 </script>
