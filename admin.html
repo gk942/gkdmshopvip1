@@ -1,50 +1,90 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html>
 <head>
-  <title>Trang admin duyệt giao dịch</title>
+  <title>Admin Duyệt Tiền | GKDM Shop</title>
+  <meta charset="UTF-8">
   <script src="firebase.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    .hidden { display: none; }
+    table {
+      width: 100%;
+      background: white;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #ff5e57;
+      color: white;
+    }
+    button {
+      padding: 6px 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    #login input {
+      padding: 8px;
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Admin - Duyệt giao dịch</h2>
-
-  <div id="loginAdmin">
-    <input type="password" id="adminPass" placeholder="Nhập mật khẩu admin">
+  <div id="login">
+    <h2>Admin đăng nhập</h2>
+    <input type="password" id="pass" placeholder="Nhập mật khẩu admin">
     <button onclick="checkPass()">Đăng nhập</button>
   </div>
 
-  <div id="adminContent" style="display:none;">
-    <h3>Danh sách giao dịch</h3>
-    <table border="1">
+  <div id="adminPanel" class="hidden">
+    <h2>Danh sách giao dịch chờ duyệt</h2>
+    <table>
       <thead>
         <tr>
           <th>UID</th>
           <th>Nội dung</th>
           <th>Trạng thái</th>
           <th>Thời gian</th>
-          <th>Duyệt</th>
+          <th>Hành động</th>
         </tr>
       </thead>
-      <tbody id="giaodichTable"></tbody>
+      <tbody id="gdList"></tbody>
     </table>
   </div>
 
   <script>
+    const matkhau = "Maka26042006";
+
     function checkPass() {
-      const pass = document.getElementById("adminPass").value;
-      if (pass === "Maka26042006") {
-        document.getElementById("loginAdmin").style.display = "none";
-        document.getElementById("adminContent").style.display = "block";
+      const input = document.getElementById("pass").value;
+      if (input === matkhau) {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("adminPanel").classList.remove("hidden");
         loadData();
       } else {
-        alert("Sai mật khẩu");
+        alert("Sai mật khẩu!");
       }
     }
 
     function loadData() {
       db.ref("giaodich").on("value", (snapshot) => {
         const data = snapshot.val();
-        const table = document.getElementById("giaodichTable");
-        table.innerHTML = "";
+        const tbody = document.getElementById("gdList");
+        tbody.innerHTML = "";
 
         for (let uid in data) {
           const item = data[uid];
@@ -56,17 +96,18 @@
             <td>${item.trangthai}</td>
             <td>${item.thoigian}</td>
             <td>
-              ${item.trangthai === "Đang chờ" 
-                ? `<button onclick="duyetGiaoDich('${uid}')">Duyệt</button>` 
-                : "Đã duyệt"}
+              ${item.trangthai === "Đang chờ"
+                ? `<button onclick="duyet('${uid}')">Duyệt</button>`
+                : "✅ Đã duyệt"}
             </td>
           `;
-          table.appendChild(row);
+
+          tbody.appendChild(row);
         }
       });
     }
 
-    function duyetGiaoDich(uid) {
+    function duyet(uid) {
       db.ref("giaodich/" + uid + "/trangthai").set("Thành công");
     }
   </script>
