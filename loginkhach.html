@@ -2,148 +2,135 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Khách hàng - Đăng nhập</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <title>Đăng nhập khách hàng</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="firebase.js"></script>
   <style>
     body {
-      background: #111;
-      color: white;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
       font-family: 'Segoe UI', sans-serif;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
     }
-    .container {
-      background: #1e1e1e;
+
+    .box {
+      background: #1e1e2f;
       padding: 30px;
       border-radius: 10px;
-      width: 90%;
+      width: 100%;
       max-width: 400px;
-      box-shadow: 0 0 15px #000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
+
     h2 {
       text-align: center;
-      color: #f39c12;
       margin-bottom: 20px;
+      color: #ff9800;
     }
+
     input {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       margin: 10px 0;
       border: none;
       border-radius: 5px;
-      font-size: 16px;
     }
+
     button {
       width: 100%;
-      padding: 12px;
-      background-color: #e67e22;
-      color: white;
+      padding: 10px;
+      background: #ff9800;
       border: none;
-      border-radius: 5px;
+      color: black;
       font-weight: bold;
-      font-size: 16px;
-      margin-top: 10px;
+      border-radius: 5px;
       cursor: pointer;
     }
+
     button:hover {
-      background-color: #d35400;
+      background: #ffa726;
     }
-    .toggle-form {
-      text-align: center;
+
+    .switch {
       margin-top: 15px;
-    }
-    .toggle-form a {
-      color: #3498db;
+      text-align: center;
       cursor: pointer;
+      color: #ccc;
+    }
+
+    .switch:hover {
+      color: #fff;
       text-decoration: underline;
     }
-    .error {
-      color: #e74c3c;
-      text-align: center;
+
+    .message {
       margin-top: 10px;
-    }
-    .hidden {
-      display: none;
+      text-align: center;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-
-<div class="container">
-  <h2 id="formTitle">🔐 Đăng Nhập</h2>
-
-  <!-- Đăng nhập -->
-  <div id="loginForm">
-    <input type="email" id="loginEmail" placeholder="Email" />
-    <input type="password" id="loginPassword" placeholder="Mật khẩu" />
-    <button onclick="dangNhap()">Đăng nhập</button>
-    <div class="toggle-form">
-      Nếu bạn chưa có tài khoản? <a onclick="chuyenSangDangKy()">Tạo tài khoản tại đây</a>
-    </div>
+  <div class="box">
+    <h2 id="form-title">Đăng nhập</h2>
+    <input type="email" id="email" placeholder="Email..." />
+    <input type="password" id="password" placeholder="Mật khẩu..." />
+    <button id="action-button" onclick="handleAction()">Đăng nhập</button>
+    <div class="switch" onclick="toggleForm()">Chưa có tài khoản? Đăng ký tại đây</div>
+    <div class="message" id="message"></div>
   </div>
 
-  <!-- Đăng ký -->
-  <div id="registerForm" class="hidden">
-    <input type="email" id="registerEmail" placeholder="Email" />
-    <input type="password" id="registerPassword" placeholder="Mật khẩu" />
-    <button onclick="dangKy()">Đăng ký</button>
-    <div class="toggle-form">
-      Đã có tài khoản? <a onclick="chuyenSangDangNhap()">Đăng nhập tại đây</a>
-    </div>
-  </div>
+  <script>
+    let isLogin = true;
 
-  <div class="error" id="errorMsg"></div>
-</div>
+    function toggleForm() {
+      isLogin = !isLogin;
+      document.getElementById("form-title").innerText = isLogin ? "Đăng nhập" : "Đăng ký";
+      document.getElementById("action-button").innerText = isLogin ? "Đăng nhập" : "Đăng ký";
+      document.querySelector(".switch").innerText = isLogin
+        ? "Chưa có tài khoản? Đăng ký tại đây"
+        : "Đã có tài khoản? Đăng nhập tại đây";
+      document.getElementById("message").innerText = "";
+    }
 
-<script>
-  function chuyenSangDangKy() {
-    document.getElementById("loginForm").classList.add("hidden");
-    document.getElementById("registerForm").classList.remove("hidden");
-    document.getElementById("formTitle").innerText = "📝 Đăng Ký";
-    document.getElementById("errorMsg").innerText = "";
-  }
+    function handleAction() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const messageEl = document.getElementById("message");
 
-  function chuyenSangDangNhap() {
-    document.getElementById("registerForm").classList.add("hidden");
-    document.getElementById("loginForm").classList.remove("hidden");
-    document.getElementById("formTitle").innerText = "🔐 Đăng Nhập";
-    document.getElementById("errorMsg").innerText = "";
-  }
+      if (email === "" || password === "") {
+        messageEl.innerText = "❌ Vui lòng nhập đầy đủ email và mật khẩu.";
+        return;
+      }
 
-  function dangNhap() {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(() => {
-        window.location.href = "index.html";
-      })
-      .catch(err => {
-        document.getElementById("errorMsg").innerText = "❌ " + err.message;
-      });
-  }
+      messageEl.innerText = "⏳ Đang xử lý...";
 
-  function dangKy() {
-    const email = document.getElementById("registerEmail").value;
-    const password = document.getElementById("registerPassword").value;
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const uid = userCredential.user.uid;
-        firebase.database().ref("users/" + uid).set({ sodu: 0 });
-        alert("✅ Đăng ký thành công. Hãy đăng nhập.");
-        chuyenSangDangNhap();
-      })
-      .catch(err => {
-        document.getElementById("errorMsg").innerText = "❌ " + err.message;
-      });
-  }
-</script>
-
+      if (isLogin) {
+        auth.signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            messageEl.innerText = "✅ Đăng nhập thành công!";
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 1000);
+          })
+          .catch((error) => {
+            messageEl.innerText = "❌ " + error.message;
+          });
+      } else {
+        auth.createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            messageEl.innerText = "✅ Đăng ký thành công! Vui lòng đăng nhập.";
+            toggleForm();
+          })
+          .catch((error) => {
+            messageEl.innerText = "❌ " + error.message;
+          });
+      }
+    }
+  </script>
 </body>
 </html>
