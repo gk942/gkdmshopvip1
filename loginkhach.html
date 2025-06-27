@@ -1,61 +1,92 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Đăng nhập khách</title>
+  <meta charset="UTF-8">
+  <title>Đăng nhập khách - Shop Game</title>
   <script src="firebase.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+      width: 300px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: orange;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff6600;
+    }
+  </style>
 </head>
 <body>
-  <h2>Đăng nhập tài khoản khách</h2>
-
-  <input type="email" id="email" placeholder="Email" />
-  <input type="password" id="password" placeholder="Mật khẩu" />
-  <br />
-  <button onclick="login()">Đăng nhập</button>
-  <button onclick="register()">Đăng ký</button>
-  <button onclick="logout()">Đăng xuất</button>
-
-  <p id="uidText"></p>
+  <div class="box">
+    <h2>Đăng nhập / Đăng ký</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button onclick="login()">Đăng nhập</button>
+    <button onclick="register()">Đăng ký</button>
+    <p id="status"></p>
+  </div>
 
   <script>
     function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       auth.signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          alert("Đăng nhập thành công!");
+        .then((userCredential) => {
           const uid = userCredential.user.uid;
           localStorage.setItem("uid", uid);
-          document.getElementById('uidText').innerText = "UID của bạn: " + uid;
+          document.getElementById("status").innerText = "Đăng nhập thành công!";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1000);
         })
-        .catch(error => alert("Lỗi đăng nhập: " + error.message));
+        .catch(error => {
+          document.getElementById("status").innerText = "Lỗi: " + error.message;
+        });
     }
 
     function register() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          alert("Đăng ký thành công!");
+        .then((userCredential) => {
           const uid = userCredential.user.uid;
           localStorage.setItem("uid", uid);
-          document.getElementById('uidText').innerText = "UID của bạn: " + uid;
+          document.getElementById("status").innerText = "Đăng ký thành công!";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1000);
         })
-        .catch(error => alert("Lỗi đăng ký: " + error.message));
+        .catch(error => {
+          document.getElementById("status").innerText = "Lỗi đăng ký: " + error.message;
+        });
     }
-
-    function logout() {
-      auth.signOut().then(() => {
-        alert("Đăng xuất thành công!");
-        localStorage.removeItem("uid");
-        document.getElementById('uidText').innerText = "";
-      });
-    }
-
-    window.onload = () => {
-      const uid = localStorage.getItem("uid");
-      if (uid) document.getElementById('uidText').innerText = "UID của bạn: " + uid;
-    };
   </script>
 </body>
 </html>
