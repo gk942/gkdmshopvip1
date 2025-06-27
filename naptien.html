@@ -2,44 +2,146 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Nạp tiền</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Nạp tiền | GKDM Shop</title>
+  <style>
+    body {
+      background: #1a1a2e;
+      color: #eaeaea;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #16213e;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+    h2 {
+      text-align: center;
+      color: #e94560;
+      margin-bottom: 20px;
+    }
+    .info {
+      background: #0f3460;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .info p {
+      margin: 5px 0;
+    }
+    .qr-section {
+      text-align: center;
+    }
+    .qr-section img {
+      width: 200px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #e94560;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background: #d32f2f;
+    }
+    #status {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #00ff99;
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-start p-6">
+<body>
+  <div class="container">
+    <h2>🔁 Nạp tiền vào tài khoản</h2>
+    <div class="info">
+      <p><strong>Email:</strong> <span id="userEmail">Đang tải...</span></p>
+      <p><strong>Mã UID:</strong> <span id="userUID">Đang tải...</span></p>
+    </div>
 
-  <div class="bg-gray-800 p-6 rounded-lg w-full max-w-lg text-center">
-    <h2 class="text-2xl font-bold mb-4">Nạp tiền vào tài khoản</h2>
+    <div class="qr-section">
+      <p>📷 Quét mã QR để chuyển khoản:</p>
+      <img src="https://img.vietqr.io/image/mbbank-0977049795-compact2.png?amount=0&addInfo=ĐANGTAI&accountName=Dinh%20Hong%20Hanh" id="qrImage" alt="QR MB Bank">
+      <p><strong>Nội dung chuyển khoản:</strong> <span id="noidung">ĐANGTAI</span></p>
+    </div>
 
-    <p class="mb-2">Ngân hàng: <strong>MB Bank</strong></p>
-    <p class="mb-2">Số tài khoản: <strong>0977049795</strong></p>
-    <p class="mb-4">Chủ tài khoản: <strong>Dinh Hong Hanh</strong></p>
-
-    <p class="mb-2">Nội dung chuyển khoản của bạn:</p>
-    <p id="uid" class="text-yellow-400 font-bold text-xl mb-4"></p>
-
-    <button onclick="xacNhan()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">Bấm vào đây nếu bạn đã bank</button>
-    <p id="msg" class="mt-4 text-sm text-yellow-300"></p>
+    <button class="btn" id="confirmBtn">✅ Tôi đã chuyển khoản</button>
+    <div id="status"></div>
   </div>
 
-  <script src="firebase.js" type="module"></script>
-  <script type="module">
-    import { firebaseFunctions, db } from './firebase.js';
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-    const { push, ref, set } = firebaseFunctions;
-    const uid = localStorage.getItem("uid");
-
-    if (!uid) window.location.href = "loginkhach.html";
-    document.getElementById("uid").innerText = uid;
-
-    window.xacNhan = async () => {
-      const giaoDichRef = push(ref(db, "giaodich"));
-      await set(giaoDichRef, {
-        uid: uid,
-        status: "Đang chờ",
-        time: new Date().toLocaleString()
-      });
-      document.getElementById("msg").innerText = "Giao dịch đang chờ duyệt. Vui lòng đợi admin xác nhận.";
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef"
     };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    const emailEl = document.getElementById('userEmail');
+    const uidEl = document.getElementById('userUID');
+    const qrImage = document.getElementById('qrImage');
+    const noidungEl = document.getElementById('noidung');
+    const statusEl = document.getElementById('status');
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        const uid = user.uid;
+        const email = user.email;
+        emailEl.innerText = email;
+        uidEl.innerText = uid;
+
+        const noidung = uid; // Có thể random thêm chuỗi nếu bạn muốn
+        noidungEl.innerText = noidung;
+
+        // Tạo lại QR với nội dung đúng UID
+        qrImage.src = `https://img.vietqr.io/image/mbbank-0977049795-compact2.png?amount=0&addInfo=${noidung}&accountName=Dinh%20Hong%20Hanh`;
+
+        // Nút xác nhận đã chuyển khoản
+        document.getElementById('confirmBtn').onclick = () => {
+          const giaoDich = {
+            uid: uid,
+            email: email,
+            noidung: noidung,
+            thoigian: new Date().toLocaleString(),
+            trangthai: "Đang chờ"
+          };
+          db.ref('giaodich/' + Date.now()).set(giaoDich)
+            .then(() => {
+              statusEl.innerText = '✅ Gửi yêu cầu thành công! Chờ admin duyệt.';
+            })
+            .catch(err => {
+              statusEl.innerText = '❌ Lỗi gửi dữ liệu: ' + err.message;
+            });
+        };
+      } else {
+        window.location.href = 'loginkhach.html';
+      }
+    });
   </script>
 </body>
 </html>
