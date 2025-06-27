@@ -1,20 +1,32 @@
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<!-- firebase.js -->
+<!-- Bạn có thể dùng file riêng hoặc gắn trong thẻ <script> -->
 
-<script>
+<!-- Nhúng Firebase SDK -->
+<script type="module">
+  // Import SDK dạng module
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // Cấu hình Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
     authDomain: "gkdmshop.firebaseapp.com",
-    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com/",
+    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
     projectId: "gkdmshop",
-    storageBucket: "gkdmshop.appspot.com",
+    storageBucket: "gkdmshop.appspot.com", // Sửa lại tên bucket cho đúng
     messagingSenderId: "52437838526",
-    appId: "1:52437838526:web:3187795557aa1458190cef"
+    appId: "1:52437838526:web:3187795557aa1458190cef",
+    measurementId: "G-V4QFPWK82L"
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-  const auth = firebase.auth();
+  // Khởi tạo Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+  const auth = getAuth(app);
+
+  // Đưa ra global (để dùng ở file HTML khác nếu cần)
+  window.firebaseApp = app;
+  window.database = database;
+  window.auth = auth;
 </script>
