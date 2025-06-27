@@ -1,197 +1,83 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Shop Bán Acc Free Fire - Giao Diện Chuyên Nghiệp</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <meta charset="UTF-8">
+  <title>Shop Bán Acc</title>
   <script src="firebase.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #111;
-      color: #fff;
-      margin: 0;
-    }
-    header {
-      background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
-      padding: 15px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-      color: #f39c12;
-    }
-    nav {
-      background: #1c1c1c;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px;
-    }
-    nav a {
+      background: #0f172a;
       color: white;
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      transition: background 0.3s;
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
-    nav a:hover {
-      background: #333;
-    }
-    .topnap {
-      background: #222;
-      margin: 15px auto;
-      padding: 15px;
-      max-width: 500px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #000;
-    }
-    .topnap h2 {
-      color: #f39c12;
-    }
-    .danhmuc {
+    .top-bar {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      margin: 20px auto;
-      max-width: 1000px;
+      justify-content: space-between;
     }
-    .acc-card {
-      background: #1e1e1e;
-      padding: 15px;
-      border-radius: 10px;
-      width: 200px;
-      text-align: center;
-      box-shadow: 0 0 8px #000;
-      transition: transform 0.2s;
+    .menu {
+      display: flex;
+      gap: 10px;
     }
-    .acc-card:hover {
-      transform: scale(1.05);
-    }
-    .acc-card img {
-      width: 100%;
-      border-radius: 10px;
-    }
-    .acc-card .gia {
-      color: #2ecc71;
-      margin-top: 8px;
+    a {
+      color: #3b82f6;
+      text-decoration: none;
       font-weight: bold;
     }
-    #taikhoanInfo {
-      display: none;
-      background: #1c1c1c;
+    .user-box {
+      background: #1e293b;
       padding: 15px;
-      border-radius: 8px;
-      margin: 15px auto;
-      max-width: 400px;
-      box-shadow: 0 0 8px #000;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none;
     }
-    #taikhoanInfo img {
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-    }
-    .info-item {
-      margin-top: 10px;
-    }
-    button {
-      background: #e74c3c;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
+    .logout-btn {
+      background: #ef4444;
       color: white;
+      border: none;
+      padding: 8px;
+      margin-top: 10px;
+      border-radius: 5px;
       cursor: pointer;
-    }
-    button:hover {
-      background: #c0392b;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🔥 Shop Bán Acc Free Fire Uy Tín 🔥</h1>
-  </header>
-
-  <nav>
-    <a href="index.html">Trang chủ</a>
-    <a href="naptien.html">Nạp tiền</a>
-    <a href="admin.html">Admin</a>
-    <a href="#" id="menu-taikhoan" onclick="toggleTaiKhoan()">Tài khoản</a>
-  </nav>
-
-  <div class="topnap">
-    <h2>🏆 Top Nạp Gần Đây</h2>
-    <ul>
-      <li>UID123456 - 200.000đ</li>
-      <li>UID234567 - 150.000đ</li>
-      <li>UID345678 - 100.000đ</li>
-    </ul>
-  </div>
-
-  <div class="danhmuc">
-    <div class="acc-card">
-      <img src="https://via.placeholder.com/200x150.png?text=Acc+VIP+1" alt="Acc 1">
-      <div class="gia">Giá: 100.000đ</div>
-    </div>
-    <div class="acc-card">
-      <img src="https://via.placeholder.com/200x150.png?text=Acc+VIP+2" alt="Acc 2">
-      <div class="gia">Giá: 200.000đ</div>
-    </div>
-    <div class="acc-card">
-      <img src="https://via.placeholder.com/200x150.png?text=Acc+VIP+3" alt="Acc 3">
-      <div class="gia">Giá: 300.000đ</div>
+  <div class="top-bar">
+    <div class="menu">
+      <a href="index.html">Trang chủ</a>
+      <a href="naptien.html">Nạp tiền</a>
+      <a href="admin.html">Admin</a>
+      <a href="loginkhach.html" id="loginLink">Tài khoản</a>
     </div>
   </div>
 
-  <div id="taikhoanInfo">
-    <h3>🔐 Thông tin tài khoản</h3>
-    <img id="avatar" src="" alt="Avatar"><br>
-    <div class="info-item">📧 Email: <span id="emailDisplay"></span></div>
-    <div class="info-item">🆔 UID: <span id="uidDisplay"></span></div>
-    <div class="info-item">💰 Số dư: <span id="soduDisplay">0đ</span></div>
-    <br>
-    <button onclick="dangXuat()">Đăng xuất</button>
+  <h2>🎮 Chào mừng đến với Shop bán acc</h2>
+
+  <div id="userBox" class="user-box">
+    <p><strong>UID:</strong> <span id="uidInfo"></span></p>
+    <p><strong>Số dư:</strong> <span id="balance">0 VNĐ</span></p>
+    <button class="logout-btn" onclick="logout()">Đăng xuất</button>
   </div>
 
   <script>
-    let daDangNhap = false;
+    const uid = localStorage.getItem('user_uid');
+    if (uid) {
+      document.getElementById('uidInfo').innerText = uid;
+      document.getElementById('loginLink').innerText = "Tài khoản của bạn";
+      document.getElementById('userBox').style.display = 'block';
 
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        daDangNhap = true;
-        document.getElementById("menu-taikhoan").innerText = "Tài khoản ✅";
-        document.getElementById("taikhoanInfo").style.display = "block";
-        document.getElementById("emailDisplay").innerText = user.email;
-        document.getElementById("uidDisplay").innerText = user.uid;
-
-        // Avatar ngẫu nhiên từ UID
-        document.getElementById("avatar").src = `https://api.dicebear.com/6.x/thumbs/svg?seed=${user.uid.slice(0, 6)}`;
-
-        // Lấy số dư thật từ Firebase
-        firebase.database().ref('users/' + user.uid + '/sodu').once('value').then((snapshot) => {
-          const sodu = snapshot.val() || 0;
-          document.getElementById("soduDisplay").innerText = sodu + "đ";
-        });
-      }
-    });
-
-    function toggleTaiKhoan() {
-      if (!daDangNhap) {
-        location.href = "loginkhach.html";
-      } else {
-        const info = document.getElementById("taikhoanInfo");
-        info.style.display = (info.style.display === "none") ? "block" : "none";
-      }
+      firebase.database().ref("giaodich/" + uid).once('value').then(snapshot => {
+        const data = snapshot.val();
+        if (data && data.status === "Thành công") {
+          document.getElementById('balance').innerText = "50.000 VNĐ"; // ví dụ
+        }
+      });
     }
 
-    function dangXuat() {
-      firebase.auth().signOut().then(() => {
-        location.href = "loginkhach.html";
-      });
+    function logout() {
+      localStorage.removeItem('user_uid');
+      window.location.href = "index.html";
     }
   </script>
 </body>
