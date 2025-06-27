@@ -1,4 +1,4 @@
-<!-- Firebase SDK (dùng CDN) -->
+<!-- Firebase SDK (CDN dùng cho Auth và Realtime DB) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -18,7 +18,7 @@
   // Khởi tạo Firebase
   firebase.initializeApp(firebaseConfig);
 
-  // ✅ Khai báo auth & database
+  // Khai báo auth & database (RẤT QUAN TRỌNG)
   const auth = firebase.auth();
   const database = firebase.database();
 </script>
