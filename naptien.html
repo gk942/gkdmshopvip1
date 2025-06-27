@@ -3,67 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <title>Nạp tiền</title>
-  <script src="firebase.js"></script>
-  <style>
-    body {
-      background: #f1f5f9;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    .box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 500px;
-      margin: auto;
-    }
-    .btn {
-      padding: 10px;
-      background: #10b981;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      width: 100%;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 10px;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="box">
-    <h2>💵 Nạp tiền qua MBBank</h2>
-    <p><strong>Số tài khoản:</strong> 0977049795</p>
-    <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-    <p><strong>Nội dung chuyển khoản:</strong> <span id="uidContent">UID1234</span></p>
-    <img src="" id="qrImg" alt="QR code" width="100%">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-start p-6">
 
-    <button class="btn" onclick="xacNhan()">Tôi đã chuyển khoản</button>
-    <p id="status"></p>
+  <div class="bg-gray-800 p-6 rounded-lg w-full max-w-lg text-center">
+    <h2 class="text-2xl font-bold mb-4">Nạp tiền vào tài khoản</h2>
+
+    <p class="mb-2">Ngân hàng: <strong>MB Bank</strong></p>
+    <p class="mb-2">Số tài khoản: <strong>0977049795</strong></p>
+    <p class="mb-4">Chủ tài khoản: <strong>Dinh Hong Hanh</strong></p>
+
+    <p class="mb-2">Nội dung chuyển khoản của bạn:</p>
+    <p id="uid" class="text-yellow-400 font-bold text-xl mb-4"></p>
+
+    <button onclick="xacNhan()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">Bấm vào đây nếu bạn đã bank</button>
+    <p id="msg" class="mt-4 text-sm text-yellow-300"></p>
   </div>
 
-  <script>
-    const uid = localStorage.getItem('user_uid');
-    if (!uid) {
-      alert("Bạn chưa đăng nhập!");
-      window.location.href = "loginkhach.html";
-    }
+  <script src="firebase.js" type="module"></script>
+  <script type="module">
+    import { firebaseFunctions, db } from './firebase.js';
 
-    document.getElementById('uidContent').innerText = uid;
-    document.getElementById('qrImg').src = `https://img.vietqr.io/image/mb-0977049795-print.png?amount=0&addInfo=${uid}&accountName=Dinh%20Hong%20Hanh`;
+    const { push, ref, set } = firebaseFunctions;
+    const uid = localStorage.getItem("uid");
 
-    function xacNhan() {
-      const now = new Date().toLocaleString();
-      firebase.database().ref('giaodich/' + uid).set({
+    if (!uid) window.location.href = "loginkhach.html";
+    document.getElementById("uid").innerText = uid;
+
+    window.xacNhan = async () => {
+      const giaoDichRef = push(ref(db, "giaodich"));
+      await set(giaoDichRef, {
         uid: uid,
-        time: now,
-        status: "Đang chờ duyệt"
-      }, (err) => {
-        document.getElementById('status').innerText = err ? "❌ Thất bại!" : "✅ Đã gửi yêu cầu chờ duyệt!";
+        status: "Đang chờ",
+        time: new Date().toLocaleString()
       });
-    }
+      document.getElementById("msg").innerText = "Giao dịch đang chờ duyệt. Vui lòng đợi admin xác nhận.";
+    };
   </script>
 </body>
 </html>
