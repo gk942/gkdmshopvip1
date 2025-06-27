@@ -2,99 +2,75 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Admin duyệt tiền</title>
+  <title>Admin Duyệt Giao Dịch</title>
   <script src="firebase.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #1c1c1c;
-      color: white;
-      padding: 20px;
-    }
-    .hidden { display: none; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-      color: black;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-    button {
-      padding: 5px 10px;
-      background: green;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: darkgreen;
-    }
+    body { background: #1c1c1c; color: white; font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+    button { padding: 6px 10px; background: #4caf50; color: white; border: none; cursor: pointer; }
+    #loginBox { background: #2c2c2c; padding: 20px; border-radius: 10px; max-width: 300px; margin: auto; text-align: center; }
   </style>
 </head>
 <body>
-  <h2>Quản lý giao dịch</h2>
-  <div id="login">
-    <p>Nhập mật khẩu admin:</p>
-    <input type="password" id="pass">
-    <button onclick="checkPass()">Đăng nhập</button>
-    <p id="loginStatus"></p>
-  </div>
 
-  <div id="adminPanel" class="hidden">
-    <table>
-      <thead>
-        <tr>
-          <th>UID</th>
-          <th>Trạng thái</th>
-          <th>Thời gian</th>
-          <th>Duyệt</th>
-        </tr>
-      </thead>
-      <tbody id="giaoDichList"></tbody>
-    </table>
-  </div>
+<div id="loginBox">
+  <h2>Đăng nhập Admin</h2>
+  <input type="password" id="adminPass" placeholder="Nhập mật khẩu"><br><br>
+  <button onclick="checkPass()">Vào quản lý</button>
+</div>
 
-  <script>
-    const adminPassword = "Maka26042006";
+<div id="adminPanel" style="display:none;">
+  <h2>Danh sách giao dịch</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>UID</th>
+        <th>Trạng thái</th>
+        <th>Duyệt</th>
+      </tr>
+    </thead>
+    <tbody id="gdTable"></tbody>
+  </table>
+</div>
 
-    function checkPass() {
-      const input = document.getElementById("pass").value;
-      if (input === adminPassword) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadGiaoDich();
-      } else {
-        document.getElementById("loginStatus").innerText = "Sai mật khẩu!";
-      }
+<script>
+  const correctPassword = "Maka26042006";
+
+  function checkPass() {
+    const input = document.getElementById("adminPass").value;
+    if (input === correctPassword) {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+      loadGiaoDich();
+    } else {
+      alert("Sai mật khẩu!");
     }
+  }
 
-    function loadGiaoDich() {
-      const table = document.getElementById("giaoDichList");
+  function loadGiaoDich() {
+    const table = document.getElementById("gdTable");
+    firebase.database().ref("giaodich").on("value", (snapshot) => {
       table.innerHTML = "";
-      firebase.database().ref("giaodich").once("value", (snapshot) => {
-        snapshot.forEach((child) => {
-          const data = child.val();
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${data.uid}</td>
-            <td>${data.trangThai}</td>
-            <td>${data.thoiGian}</td>
-            <td>${data.trangThai === "Thành công" ? "✓" : `<button onclick="duyetGiaoDich('${data.uid}')">Duyệt</button>`}</td>
-          `;
-          table.appendChild(row);
-        });
+      snapshot.forEach((child) => {
+        const data = child.val();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${data.uid}</td>
+          <td>${data.trangthai}</td>
+          <td>
+            ${data.trangthai === "Đang chờ" ? `<button onclick="duyetGiaoDich('${data.uid}')">Duyệt</button>` : "✓"}
+          </td>
+        `;
+        table.appendChild(row);
       });
-    }
+    });
+  }
 
-    function duyetGiaoDich(uid) {
-      firebase.database().ref("giaodich/" + uid).update({ trangThai: "Thành công" })
-        .then(() => loadGiaoDich());
-    }
-  </script>
+  function duyetGiaoDich(uid) {
+    firebase.database().ref("giaodich/" + uid).update({ trangthai: "Thành công" });
+  }
+</script>
+
 </body>
 </html>
