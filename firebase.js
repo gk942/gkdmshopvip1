@@ -1,22 +1,36 @@
 <!-- firebase.js -->
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script type="module">
+  // Import SDK compat
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/compat/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/compat/firebase-auth.js";
+  import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/compat/firebase-database.js";
 
-<script>
+  // Firebase config
   const firebaseConfig = {
-    apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+    apiKey: "YOUR_API_KEY",
     authDomain: "gkdmshop.firebaseapp.com",
     databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
     projectId: "gkdmshop",
     storageBucket: "gkdmshop.appspot.com",
-    messagingSenderId: "52437838526",
-    appId: "1:52437838526:web:3187795557aa1458190cef",
-    measurementId: "G-V4QFPWK82L"
+    messagingSenderId: "YOUR_MSG_ID",
+    appId: "YOUR_APP_ID"
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const database = firebase.database();
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  window.auth = getAuth(app);
+  window.db = getDatabase(app);
+
+  // Expose Firebase functions globally
+  window.firebaseFunctions = {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    ref,
+    set,
+    push,
+    onValue,
+    update
+  };
 </script>
