@@ -2,9 +2,10 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Đăng nhập khách hàng</title>
+  <title>Đăng nhập / Đăng ký - Khách hàng</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
@@ -13,46 +14,187 @@
       projectId: "gkdmshop",
       storageBucket: "gkdmshop.appspot.com",
       messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef"
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
     };
     firebase.initializeApp(firebaseConfig);
   </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 10px;
+      width: 320px;
+      box-shadow: 0 0 10px #00000070;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #facc15;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      background: #f97316;
+      color: white;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ea580c;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 15px;
+    }
+
+    .tabs button {
+      background: transparent;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tabs button.active {
+      color: #facc15;
+      border-bottom: 2px solid #facc15;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 0.9em;
+      margin-top: 5px;
+      text-align: center;
+    }
+
+    .success {
+      color: #4ade80;
+      font-size: 0.9em;
+      margin-top: 5px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <h2>Đăng nhập khách</h2>
-  <input type="email" id="email" placeholder="Email"><br>
-  <input type="password" id="password" placeholder="Mật khẩu"><br>
-  <button onclick="dangNhap()">Đăng nhập</button>
-  <button onclick="dangKy()">Đăng ký</button>
+  <div class="container">
+    <div class="tabs">
+      <button id="loginTab" class="active" onclick="showLogin()">Đăng nhập</button>
+      <button id="registerTab" onclick="showRegister()">Đăng ký</button>
+    </div>
+
+    <div id="loginForm">
+      <h2>Đăng nhập</h2>
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Mật khẩu" required>
+      <button onclick="dangNhap()">Đăng nhập</button>
+      <p id="loginStatus" class="error"></p>
+    </div>
+
+    <div id="registerForm" class="hidden">
+      <h2>Đăng ký</h2>
+      <input type="email" id="registerEmail" placeholder="Email" required>
+      <input type="password" id="registerPassword" placeholder="Mật khẩu (min 6 kí tự)" required>
+      <button onclick="dangKy()">Đăng ký</button>
+      <p id="registerStatus" class="error"></p>
+    </div>
+  </div>
 
   <script>
+    function showLogin() {
+      document.getElementById("loginForm").classList.remove("hidden");
+      document.getElementById("registerForm").classList.add("hidden");
+      document.getElementById("loginTab").classList.add("active");
+      document.getElementById("registerTab").classList.remove("active");
+    }
+
+    function showRegister() {
+      document.getElementById("registerForm").classList.remove("hidden");
+      document.getElementById("loginForm").classList.add("hidden");
+      document.getElementById("registerTab").classList.add("active");
+      document.getElementById("loginTab").classList.remove("active");
+    }
+
     function dangKy() {
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      firebase.auth().createUserWithEmailAndPassword(email, pass)
-        .then(userCredential => {
-          const uid = userCredential.user.uid;
-          localStorage.setItem('uid', uid);
-          alert("✅ Đăng ký thành công!");
-          window.location.href = "index.html";
+      const email = document.getElementById("registerEmail").value.trim();
+      const password = document.getElementById("registerPassword").value;
+      const status = document.getElementById("registerStatus");
+
+      status.innerText = "";
+
+      if (!email.includes("@") || !email.includes(".")) {
+        status.innerText = "❌ Email không hợp lệ.";
+        return;
+      }
+
+      if (password.length < 6) {
+        status.innerText = "❌ Mật khẩu phải ít nhất 6 ký tự.";
+        return;
+      }
+
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          status.classList.remove("error");
+          status.classList.add("success");
+          status.innerText = "✅ Đăng ký thành công! Vui lòng đăng nhập.";
+          showLogin();
         })
         .catch(error => {
-          alert("❌ Lỗi: " + error.message);
+          status.innerText = "❌ " + error.message;
         });
     }
 
     function dangNhap() {
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      firebase.auth().signInWithEmailAndPassword(email, pass)
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const status = document.getElementById("loginStatus");
+
+      status.innerText = "";
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           const uid = userCredential.user.uid;
-          localStorage.setItem('uid', uid);
-          alert("✅ Đăng nhập thành công!");
-          window.location.href = "index.html";
+          localStorage.setItem("uid", uid);
+          status.classList.remove("error");
+          status.classList.add("success");
+          status.innerText = "✅ Đăng nhập thành công! Đang chuyển...";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1000);
         })
         .catch(error => {
-          alert("❌ Lỗi: " + error.message);
+          status.innerText = "❌ " + error.message;
         });
     }
   </script>
