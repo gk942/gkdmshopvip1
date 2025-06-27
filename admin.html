@@ -1,93 +1,88 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin - Duyệt Giao Dịch</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Duyệt Giao Dịch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #0f172a;
-      color: white;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to bottom right, #1a1a2e, #16213e);
+      color: #fff;
       padding: 20px;
+      margin: 0;
     }
     h2 {
       text-align: center;
-      color: #38bdf8;
+      color: #00f7ff;
     }
-    #loginForm, #adminContent {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #1e293b;
+    #loginForm {
+      max-width: 400px;
+      margin: auto;
+      text-align: center;
+      background: #0f3460;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 10px;
     }
-    input {
-      width: 100%;
+    input, button {
       padding: 10px;
-      margin: 10px 0;
+      margin-top: 10px;
+      width: 90%;
       border: none;
       border-radius: 5px;
     }
     button {
-      padding: 10px;
-      width: 100%;
-      background-color: #38bdf8;
+      background-color: #00f7ff;
       color: #000;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #00c8d4;
+    }
+    #adminContent {
+      display: none;
+      margin-top: 30px;
     }
     table {
       width: 100%;
-      margin-top: 15px;
       border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #0f3460;
+      color: #fff;
     }
     th, td {
+      border: 1px solid #00f7ff;
       padding: 10px;
-      border-bottom: 1px solid #334155;
       text-align: center;
     }
-    .status {
-      font-weight: bold;
+    th {
+      background-color: #1a1a2e;
     }
-    .pending {
+    .status-waiting {
       color: orange;
     }
-    .success {
-      color: #22c55e;
+    .status-success {
+      color: #00ff00;
     }
   </style>
 </head>
 <body>
-  <h2>🔐 Admin Duyệt Giao Dịch</h2>
 
   <div id="loginForm">
-    <input type="password" id="adminPassword" placeholder="Nhập mật khẩu admin..." />
-    <button onclick="checkAdmin()">Đăng nhập admin</button>
-    <p id="loginStatus" style="color: red; text-align: center;"></p>
+    <h2>🔒 Đăng nhập Admin</h2>
+    <input type="password" id="adminPassword" placeholder="Nhập mật khẩu admin">
+    <button onclick="checkAdmin()">Đăng nhập</button>
+    <p id="loginStatus" style="color: red; margin-top: 10px;"></p>
   </div>
 
-  <div id="adminContent" style="display: none;">
-    <h3 style="text-align:center;">📋 Danh sách giao dịch chờ duyệt</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Số tiền</th>
-          <th>UID</th>
-          <th>Trạng thái</th>
-          <th>Duyệt</th>
-        </tr>
-      </thead>
-      <tbody id="transactionTable">
-        <tr><td colspan="5">⏳ Đang tải dữ liệu...</td></tr>
-      </tbody>
-    </table>
+  <div id="adminContent">
+    <h2>📋 Danh sách giao dịch cần duyệt</h2>
+    <div id="transactionsTable">⏳ Đang tải dữ liệu...</div>
   </div>
 
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
@@ -99,13 +94,14 @@
       projectId: "gkdmshop",
       storageBucket: "gkdmshop.appspot.com",
       messagingSenderId: "52437838526",
-      appId: "1:52437838526:web:3187795557aa1458190cef"
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const ADMIN_PASSWORD = "Maka26042006"; // bạn có thể thay đổi nếu muốn
+    const ADMIN_PASSWORD = "Maka26042006";
 
     function checkAdmin() {
       const pass = document.getElementById("adminPassword").value;
@@ -119,32 +115,48 @@
     }
 
     function loadTransactions() {
-      const tableBody = document.getElementById("transactionTable");
-      const dataRef = ref(db, 'giaodich');
-      onValue(dataRef, (snapshot) => {
-        tableBody.innerHTML = '';
-        if (!snapshot.exists()) {
-          tableBody.innerHTML = `<tr><td colspan="5">❌ Không có giao dịch nào.</td></tr>`;
+      const transRef = ref(db, "giaodich");
+      onValue(transRef, (snapshot) => {
+        const data = snapshot.val();
+        const container = document.getElementById("transactionsTable");
+        if (!data) {
+          container.innerHTML = "<p>Không có giao dịch nào.</p>";
           return;
         }
-        snapshot.forEach(child => {
-          const uid = child.key;
-          const data = child.val();
-          const row = document.createElement("tr");
 
-          row.innerHTML = `
-            <td>${data.email || '(không có)'}</td>
-            <td>${data.sotien}</td>
-            <td>${uid}</td>
-            <td class="status ${data.trangthai === 'Thành công' ? 'success' : 'pending'}">${data.trangthai}</td>
-            <td>${data.trangthai === 'Thành công' ? '✅' : `<button onclick="duyetGiaoDich('${uid}')">Duyệt</button>`}</td>
+        let html = `
+          <table>
+            <tr>
+              <th>UID</th>
+              <th>Email</th>
+              <th>Số tiền</th>
+              <th>Trạng thái</th>
+              <th>Duyệt</th>
+            </tr>
+        `;
+
+        Object.entries(data).forEach(([uid, info]) => {
+          html += `
+            <tr>
+              <td>${uid}</td>
+              <td>${info.email || ''}</td>
+              <td>${info.sotien || 0}đ</td>
+              <td class="${info.trangthai === 'Thành công' ? 'status-success' : 'status-waiting'}">
+                ${info.trangthai}
+              </td>
+              <td>
+                ${info.trangthai === 'Đang chờ' ? `<button onclick="duyetGiaoDich('${uid}')">Duyệt</button>` : '✅'}
+              </td>
+            </tr>
           `;
-          tableBody.appendChild(row);
         });
+
+        html += `</table>`;
+        container.innerHTML = html;
       });
     }
 
-    window.duyetGiaoDich = function(uid) {
+    function duyetGiaoDich(uid) {
       const updateRef = ref(db, `giaodich/${uid}`);
       update(updateRef, {
         trangthai: "Thành công"
@@ -152,6 +164,11 @@
         alert("✅ Đã duyệt thành công!");
       });
     }
+
+    // Fix: Gắn hàm vào window để HTML gọi được
+    window.checkAdmin = checkAdmin;
+    window.duyetGiaoDich = duyetGiaoDich;
   </script>
+
 </body>
 </html>
