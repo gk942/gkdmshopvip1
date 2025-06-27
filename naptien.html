@@ -5,53 +5,63 @@
   <title>Nạp tiền</title>
   <script src="firebase.js"></script>
   <style>
-    body { font-family: Arial; background: #f0f0f0; padding: 30px; }
-    .container {
-      background: white; padding: 20px; max-width: 450px;
-      margin: auto; border-radius: 10px; box-shadow: 0 0 10px gray;
+    body {
+      background: #f1f5f9;
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
-    .btn { padding: 10px; background: #2196f3; color: white; border: none; width: 100%; border-radius: 6px; cursor: pointer; }
-    .btn:hover { background: #0d8be0; }
-    .qr-img { width: 100%; }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+    }
+    .btn {
+      padding: 10px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>💳 Nạp tiền vào tài khoản</h2>
-    <p><strong>Ngân hàng:</strong> MB Bank</p>
+  <div class="box">
+    <h2>💵 Nạp tiền qua MBBank</h2>
     <p><strong>Số tài khoản:</strong> 0977049795</p>
     <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-    <p><strong>Nội dung chuyển khoản:</strong> <span id="ndck"></span></p>
-    <img class="qr-img" id="qr" src="" alt="QR Code">
-    <br><br>
-    <button class="btn" onclick="xacNhanNap()">📤 Tôi đã chuyển khoản</button>
+    <p><strong>Nội dung chuyển khoản:</strong> <span id="uidContent">UID1234</span></p>
+    <img src="" id="qrImg" alt="QR code" width="100%">
+
+    <button class="btn" onclick="xacNhan()">Tôi đã chuyển khoản</button>
     <p id="status"></p>
   </div>
 
   <script>
-    const uid = localStorage.getItem('uid');
+    const uid = localStorage.getItem('user_uid');
     if (!uid) {
       alert("Bạn chưa đăng nhập!");
-      location.href = "loginkhach.html";
+      window.location.href = "loginkhach.html";
     }
 
-    document.getElementById('ndck').innerText = uid;
-    document.getElementById('qr').src = `https://img.vietqr.io/image/mb-0977049795-print.png?amount=0&addInfo=${uid}&accountName=Dinh%20Hong%20Hanh`;
+    document.getElementById('uidContent').innerText = uid;
+    document.getElementById('qrImg').src = `https://img.vietqr.io/image/mb-0977049795-print.png?amount=0&addInfo=${uid}&accountName=Dinh%20Hong%20Hanh`;
 
-    function xacNhanNap() {
-      const time = new Date().toLocaleString();
-      document.getElementById('status').innerText = "⏳ Đang gửi yêu cầu...";
-
-      database.ref("giaodich/" + uid).set({
+    function xacNhan() {
+      const now = new Date().toLocaleString();
+      firebase.database().ref('giaodich/' + uid).set({
         uid: uid,
-        time: time,
+        time: now,
         status: "Đang chờ duyệt"
-      }, (error) => {
-        if (error) {
-          document.getElementById('status').innerText = "❌ Gửi thất bại!";
-        } else {
-          document.getElementById('status').innerText = "✅ Đã gửi. Vui lòng chờ admin duyệt.";
-        }
+      }, (err) => {
+        document.getElementById('status').innerText = err ? "❌ Thất bại!" : "✅ Đã gửi yêu cầu chờ duyệt!";
       });
     }
   </script>
