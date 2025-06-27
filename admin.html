@@ -1,95 +1,96 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Duyệt Giao Dịch</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trang Admin | Shop Bán Acc</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      margin: 0;
       padding: 20px;
     }
-    h2 {
+    h1 {
+      color: #00ffc8;
       text-align: center;
-      color: #ff9800;
     }
-    #login {
-      text-align: center;
-      margin-top: 100px;
-    }
-    input[type="password"] {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #ff9800;
-      color: #000;
-      border: none;
-      border-radius: 5px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    #content {
-      display: none;
-      margin-top: 30px;
+    #adminSection {
+      max-width: 1000px;
+      margin: 20px auto;
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background: #1e1e1e;
+      background-color: #222;
     }
     th, td {
-      border: 1px solid #444;
       padding: 10px;
+      border: 1px solid #444;
       text-align: center;
     }
     th {
-      background-color: #ff9800;
-      color: #000;
+      background-color: #333;
     }
     .btn-duyet {
-      background: #4caf50;
-      color: #fff;
+      background-color: #00ffc8;
       border: none;
+      color: #000;
       padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
     }
     .thanhcong {
-      color: #4caf50;
+      color: #00ff00;
+      font-weight: bold;
+    }
+    #loginSection {
+      text-align: center;
+    }
+    input[type="password"] {
+      padding: 10px;
+      width: 250px;
+      margin-top: 10px;
+      border-radius: 4px;
+      border: 1px solid #555;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #00ffc8;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+      border-radius: 4px;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
+  <h1>Quản Trị Giao Dịch</h1>
 
-  <h2>Trang Quản Trị Giao Dịch</h2>
-
-  <div id="login">
-    <p>Nhập mật khẩu admin để vào:</p>
-    <input type="password" id="adminPass" placeholder="Mật khẩu admin">
+  <div id="loginSection">
+    <p>🔒 Nhập mật khẩu admin để truy cập:</p>
+    <input type="password" id="adminPassword" placeholder="Nhập mật khẩu...">
     <br>
-    <button onclick="checkAdmin()">Đăng nhập</button>
-    <p id="loginError" style="color: red; margin-top: 10px;"></p>
+    <button onclick="checkPassword()">Đăng nhập</button>
   </div>
 
-  <div id="content">
-    <h3>Danh sách giao dịch đang chờ duyệt</h3>
+  <div id="adminSection" style="display: none;">
+    <h2>📝 Danh sách giao dịch chờ duyệt</h2>
     <table>
       <thead>
         <tr>
           <th>Email</th>
           <th>UID</th>
           <th>Thời gian</th>
-          <th>Nội dung CK</th>
+          <th>Nội dung</th>
           <th>Trạng thái</th>
-          <th>Thao tác</th>
+          <th>Hành động</th>
         </tr>
       </thead>
       <tbody id="giaodichTable">
@@ -98,10 +99,11 @@
     </table>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
       authDomain: "gkdmshop.firebaseapp.com",
@@ -113,27 +115,28 @@
       measurementId: "G-V4QFPWK82L"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    function checkAdmin() {
-      const pass = document.getElementById("adminPass").value;
+    function checkPassword() {
+      const pass = document.getElementById("adminPassword").value;
       if (pass === "Maka26042006") {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("content").style.display = "block";
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("adminSection").style.display = "block";
         loadGiaoDich();
       } else {
-        document.getElementById("loginError").innerText = "❌ Mật khẩu không đúng!";
+        alert("❌ Sai mật khẩu admin!");
       }
     }
 
     function loadGiaoDich() {
       const table = document.getElementById("giaodichTable");
-      const refGD = ref(db, "giaodich");
+      const refGD = db.ref("giaodich");
 
-      onValue(refGD, (snapshot) => {
+      refGD.on("value", (snapshot) => {
         const data = snapshot.val();
-        table.innerHTML = "";
+        table.innerHTML = ""; // XÓA nội dung cũ
+
         if (!data) {
           table.innerHTML = "<tr><td colspan='6'>Không có giao dịch nào.</td></tr>";
           return;
@@ -161,16 +164,11 @@
       });
     }
 
-    window.checkAdmin = checkAdmin;
-
-    window.duyet = function(uid, maGD) {
-      const updates = {};
-      updates[`giaodich/${uid}/${maGD}/trangthai`] = "Thành công";
-      update(ref(db), updates).then(() => {
-        alert("✔️ Duyệt thành công!");
-      });
-    };
+    function duyet(uid, maGD) {
+      const refTrangThai = db.ref(`giaodich/${uid}/${maGD}/trangthai`);
+      refTrangThai.set("Thành công");
+      alert("✅ Đã duyệt giao dịch.");
+    }
   </script>
-
 </body>
 </html>
