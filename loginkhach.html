@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Đăng nhập khách hàng</title>
+  <title>Khách hàng - Đăng nhập</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -10,84 +10,140 @@
   <script src="firebase.js"></script>
   <style>
     body {
-      background: #0f0f0f;
-      color: #fff;
-      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 40px 20px;
+      height: 100vh;
+      margin: 0;
     }
     .container {
-      background: #1c1c1c;
-      padding: 25px;
+      background: #1e1e1e;
+      padding: 30px;
       border-radius: 10px;
+      width: 90%;
       max-width: 400px;
-      width: 100%;
-      box-shadow: 0 0 10px #000;
+      box-shadow: 0 0 15px #000;
     }
     h2 {
       text-align: center;
       color: #f39c12;
+      margin-bottom: 20px;
     }
     input {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 5px;
+      padding: 12px;
+      margin: 10px 0;
       border: none;
+      border-radius: 5px;
+      font-size: 16px;
     }
     button {
       width: 100%;
-      padding: 10px;
-      background: #e67e22;
+      padding: 12px;
+      background-color: #e67e22;
+      color: white;
       border: none;
       border-radius: 5px;
-      color: white;
       font-weight: bold;
-      cursor: pointer;
+      font-size: 16px;
       margin-top: 10px;
+      cursor: pointer;
     }
     button:hover {
-      background: #d35400;
+      background-color: #d35400;
+    }
+    .toggle-form {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .toggle-form a {
+      color: #3498db;
+      cursor: pointer;
+      text-decoration: underline;
     }
     .error {
       color: #e74c3c;
-      margin-top: 8px;
       text-align: center;
+      margin-top: 10px;
+    }
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🔐 Đăng nhập / Đăng ký</h2>
-    <input type="email" id="email" placeholder="Nhập email" />
-    <input type="password" id="password" placeholder="Nhập mật khẩu" />
+
+<div class="container">
+  <h2 id="formTitle">🔐 Đăng Nhập</h2>
+
+  <!-- Đăng nhập -->
+  <div id="loginForm">
+    <input type="email" id="loginEmail" placeholder="Email" />
+    <input type="password" id="loginPassword" placeholder="Mật khẩu" />
     <button onclick="dangNhap()">Đăng nhập</button>
-    <button onclick="dangKy()">Đăng ký</button>
-    <div class="error" id="errorMsg"></div>
+    <div class="toggle-form">
+      Nếu bạn chưa có tài khoản? <a onclick="chuyenSangDangKy()">Tạo tài khoản tại đây</a>
+    </div>
   </div>
 
-  <script>
-    function dangNhap() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => location.href = "index.html")
-        .catch(err => document.getElementById("errorMsg").innerText = "❌ " + err.message);
-    }
+  <!-- Đăng ký -->
+  <div id="registerForm" class="hidden">
+    <input type="email" id="registerEmail" placeholder="Email" />
+    <input type="password" id="registerPassword" placeholder="Mật khẩu" />
+    <button onclick="dangKy()">Đăng ký</button>
+    <div class="toggle-form">
+      Đã có tài khoản? <a onclick="chuyenSangDangNhap()">Đăng nhập tại đây</a>
+    </div>
+  </div>
 
-    function dangKy() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          const uid = userCredential.user.uid;
-          firebase.database().ref('users/' + uid).set({ sodu: 0 });
-          alert("✅ Đăng ký thành công, bạn có thể đăng nhập");
-        })
-        .catch(err => document.getElementById("errorMsg").innerText = "❌ " + err.message);
-    }
-  </script>
+  <div class="error" id="errorMsg"></div>
+</div>
+
+<script>
+  function chuyenSangDangKy() {
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("registerForm").classList.remove("hidden");
+    document.getElementById("formTitle").innerText = "📝 Đăng Ký";
+    document.getElementById("errorMsg").innerText = "";
+  }
+
+  function chuyenSangDangNhap() {
+    document.getElementById("registerForm").classList.add("hidden");
+    document.getElementById("loginForm").classList.remove("hidden");
+    document.getElementById("formTitle").innerText = "🔐 Đăng Nhập";
+    document.getElementById("errorMsg").innerText = "";
+  }
+
+  function dangNhap() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(() => {
+        window.location.href = "index.html";
+      })
+      .catch(err => {
+        document.getElementById("errorMsg").innerText = "❌ " + err.message;
+      });
+  }
+
+  function dangKy() {
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const uid = userCredential.user.uid;
+        firebase.database().ref("users/" + uid).set({ sodu: 0 });
+        alert("✅ Đăng ký thành công. Hãy đăng nhập.");
+        chuyenSangDangNhap();
+      })
+      .catch(err => {
+        document.getElementById("errorMsg").innerText = "❌ " + err.message;
+      });
+  }
+</script>
+
 </body>
 </html>
