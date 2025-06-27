@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thông tin tài khoản</title>
+  <script src="firebase.js"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #1e1e2f, #2c3e50);
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #2c2f3e;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: auto;
+      border: 3px solid #00aced;
+    }
+
+    .info {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .info h2 {
+      margin: 10px 0;
+    }
+
+    .info p {
+      margin: 5px 0;
+      color: #ccc;
+    }
+
+    .logout-btn {
+      background-color: #e74c3c;
+      border: none;
+      padding: 12px 20px;
+      color: white;
+      font-weight: bold;
+      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 6px;
+      width: 100%;
+    }
+
+    .logout-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="" id="avatar" class="avatar">
+    <div class="info">
+      <h2 id="email">Tài khoản</h2>
+      <p><strong>UID:</strong> <span id="uid"></span></p>
+      <p><strong>Số dư:</strong> <span id="balance">Đang tải...</span> VNĐ</p>
+    </div>
+    <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+  </div>
+
+  <script>
+    // Tạo URL avatar ngẫu nhiên
+    function randomAvatar() {
+      const id = Math.floor(Math.random() * 1000);
+      return `https://i.pravatar.cc/150?img=${id}`;
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('email').innerText = user.email;
+        document.getElementById('uid').innerText = user.uid;
+        document.getElementById('avatar').src = randomAvatar();
+
+        // Lấy số dư từ database
+        database.ref('users/' + user.uid + '/sodu').once('value').then(snapshot => {
+          const sodu = snapshot.val() || 0;
+          document.getElementById('balance').innerText = sodu.toLocaleString();
+        });
+      } else {
+        alert("Bạn chưa đăng nhập!");
+        window.location.href = "loginkhach.html";
+      }
+    });
+
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "loginkhach.html";
+      });
+    }
+  </script>
+</body>
+</html>
