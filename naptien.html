@@ -2,46 +2,17 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Nạp tiền - Shop Bán Acc</title>
+  <title>Nạp tiền</title>
   <script src="firebase.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #e8f0fe;
-      padding: 20px;
-    }
+    body { font-family: Arial; background: #f0f0f0; padding: 30px; }
     .container {
-      background: white;
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      background: white; padding: 20px; max-width: 450px;
+      margin: auto; border-radius: 10px; box-shadow: 0 0 10px gray;
     }
-    .qr-img {
-      max-width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-    }
-    .btn {
-      padding: 12px;
-      background-color: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-      font-size: 16px;
-      margin-top: 10px;
-    }
-    .btn:hover {
-      background-color: #0d47a1;
-    }
-    .status {
-      margin-top: 12px;
-      font-weight: bold;
-      text-align: center;
-    }
+    .btn { padding: 10px; background: #2196f3; color: white; border: none; width: 100%; border-radius: 6px; cursor: pointer; }
+    .btn:hover { background: #0d8be0; }
+    .qr-img { width: 100%; }
   </style>
 </head>
 <body>
@@ -50,38 +21,36 @@
     <p><strong>Ngân hàng:</strong> MB Bank</p>
     <p><strong>Số tài khoản:</strong> 0977049795</p>
     <p><strong>Chủ tài khoản:</strong> Dinh Hong Hanh</p>
-    <p><strong>Nội dung chuyển khoản:</strong> <span id="transfer-content">UID123456</span></p>
-    <img class="qr-img" id="qr-img" src="" alt="QR MBBank">
-
-    <button class="btn" onclick="xacNhanNapTien()">✅ Tôi đã chuyển khoản</button>
-    <p class="status" id="status"></p>
+    <p><strong>Nội dung chuyển khoản:</strong> <span id="ndck"></span></p>
+    <img class="qr-img" id="qr" src="" alt="QR Code">
+    <br><br>
+    <button class="btn" onclick="xacNhanNap()">📤 Tôi đã chuyển khoản</button>
+    <p id="status"></p>
   </div>
 
   <script>
-    function taoUIDNgauNhien() {
-      return 'UID' + Math.floor(100000 + Math.random() * 900000);
+    const uid = localStorage.getItem('uid');
+    if (!uid) {
+      alert("Bạn chưa đăng nhập!");
+      location.href = "loginkhach.html";
     }
 
-    const uid = localStorage.getItem('uid_naptien') || taoUIDNgauNhien();
-    localStorage.setItem('uid_naptien', uid);
-    document.getElementById('transfer-content').innerText = uid;
+    document.getElementById('ndck').innerText = uid;
+    document.getElementById('qr').src = `https://img.vietqr.io/image/mb-0977049795-print.png?amount=0&addInfo=${uid}&accountName=Dinh%20Hong%20Hanh`;
 
-    const qrURL = `https://img.vietqr.io/image/mb-0977049795-print.png?amount=0&addInfo=${uid}&accountName=Dinh%20Hong%20Hanh`;
-    document.getElementById("qr-img").src = qrURL;
-
-    function xacNhanNapTien() {
+    function xacNhanNap() {
       const time = new Date().toLocaleString();
-      document.getElementById("status").innerText = "⏳ Đang gửi yêu cầu duyệt...";
+      document.getElementById('status').innerText = "⏳ Đang gửi yêu cầu...";
 
-      firebase.database().ref("giaodich/" + uid).set({
+      database.ref("giaodich/" + uid).set({
         uid: uid,
         time: time,
         status: "Đang chờ duyệt"
-      }, function(error) {
+      }, (error) => {
         if (error) {
-          document.getElementById("status").innerText = "❌ Gửi thất bại. Vui lòng thử lại.";
+          document.getElementById('status').innerText = "❌ Gửi thất bại!";
         } else {
-          document.getElementById("status").innerText = "✅ Đã gửi. Vui lòng chờ admin duyệt!";
+          document.getElementById('status').innerText = "✅ Đã gửi. Vui lòng chờ admin duyệt.";
         }
       });
     }
