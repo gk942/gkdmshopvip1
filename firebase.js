@@ -7,14 +7,14 @@
   const firebaseConfig = {
     apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
     authDomain: "gkdmshop.firebaseapp.com",
-    databaseURL: "https://gkdmshop-default-rtdb.asia-southeast1.firebasedatabase.app",
+    databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
     projectId: "gkdmshop",
     storageBucket: "gkdmshop.appspot.com",
     messagingSenderId: "52437838526",
-    appId: "1:52437838526:web:3187795557aa1458190cef",
-    measurementId: "G-V4QFPWK82L"
+    appId: "1:52437838526:web:3187795557aa1458190cef"
   };
 
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
+  const auth = firebase.auth();
 </script>
