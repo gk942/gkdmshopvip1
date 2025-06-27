@@ -3,42 +3,172 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Duyệt Giao Dịch</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #ff9800;
+    }
+    #login {
+      text-align: center;
+      margin-top: 100px;
+    }
+    input[type="password"] {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #ff9800;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #content {
+      display: none;
+      margin-top: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #1e1e1e;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #ff9800;
+      color: #000;
+    }
+    .btn-duyet {
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .thanhcong {
+      color: #4caf50;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white p-6">
-  <h1 class="text-3xl font-bold mb-4">Quản lý giao dịch</h1>
+<body>
 
-  <div id="giaodich-list" class="space-y-4"></div>
+  <h2>Trang Quản Trị Giao Dịch</h2>
 
-  <script src="firebase.js" type="module"></script>
+  <div id="login">
+    <p>Nhập mật khẩu admin để vào:</p>
+    <input type="password" id="adminPass" placeholder="Mật khẩu admin">
+    <br>
+    <button onclick="checkAdmin()">Đăng nhập</button>
+    <p id="loginError" style="color: red; margin-top: 10px;"></p>
+  </div>
+
+  <div id="content">
+    <h3>Danh sách giao dịch đang chờ duyệt</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>UID</th>
+          <th>Thời gian</th>
+          <th>Nội dung CK</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="giaodichTable">
+        <tr><td colspan="6">⏳ Đang tải dữ liệu...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
   <script type="module">
-    import { firebaseFunctions, db } from './firebase.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-    const { ref, onValue, update } = firebaseFunctions;
-    const listDiv = document.getElementById("giaodich-list");
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
+      authDomain: "gkdmshop.firebaseapp.com",
+      databaseURL: "https://gkdmshop-default-rtdb.firebaseio.com",
+      projectId: "gkdmshop",
+      storageBucket: "gkdmshop.appspot.com",
+      messagingSenderId: "52437838526",
+      appId: "1:52437838526:web:3187795557aa1458190cef",
+      measurementId: "G-V4QFPWK82L"
+    };
 
-    const gdRef = ref(db, "giaodich");
-    onValue(gdRef, (snapshot) => {
-      const data = snapshot.val();
-      listDiv.innerHTML = "";
-      if (!data) return listDiv.innerText = "Không có giao dịch nào.";
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-      Object.entries(data).forEach(([key, val]) => {
-        const item = document.createElement("div");
-        item.className = "p-4 bg-gray-800 rounded";
-        item.innerHTML = `
-          <p><strong>UID:</strong> ${val.uid}</p>
-          <p><strong>Thời gian:</strong> ${val.time}</p>
-          <p><strong>Trạng thái:</strong> <span id="status-${key}" class="${val.status === 'Thành công' ? 'text-green-400' : 'text-yellow-300'}">${val.status}</span></p>
-          ${val.status === "Đang chờ" ? `<button onclick="duyet('${key}')" class="mt-2 bg-blue-500 px-3 py-1 rounded">Duyệt</button>` : ""}
-        `;
-        listDiv.appendChild(item);
+    function checkAdmin() {
+      const pass = document.getElementById("adminPass").value;
+      if (pass === "Maka26042006") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("content").style.display = "block";
+        loadGiaoDich();
+      } else {
+        document.getElementById("loginError").innerText = "❌ Mật khẩu không đúng!";
+      }
+    }
+
+    function loadGiaoDich() {
+      const table = document.getElementById("giaodichTable");
+      const refGD = ref(db, "giaodich");
+
+      onValue(refGD, (snapshot) => {
+        const data = snapshot.val();
+        table.innerHTML = "";
+        if (!data) {
+          table.innerHTML = "<tr><td colspan='6'>Không có giao dịch nào.</td></tr>";
+          return;
+        }
+
+        Object.keys(data).forEach(uid => {
+          Object.keys(data[uid]).forEach(maGD => {
+            const gd = data[uid][maGD];
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${gd.email || "Không có"}</td>
+              <td>${uid}</td>
+              <td>${gd.thoigian || ""}</td>
+              <td>${gd.noidung || ""}</td>
+              <td class="${gd.trangthai === 'Thành công' ? 'thanhcong' : ''}">
+                ${gd.trangthai}
+              </td>
+              <td>
+                ${gd.trangthai === 'Đang chờ' ? `<button class="btn-duyet" onclick="duyet('${uid}', '${maGD}')">Duyệt</button>` : '✅'}
+              </td>
+            `;
+            table.appendChild(row);
+          });
+        });
       });
-    });
+    }
 
-    window.duyet = async (id) => {
-      await update(ref(db, "giaodich/" + id), { status: "Thành công" });
+    window.duyet = function(uid, maGD) {
+      const updates = {};
+      updates[`giaodich/${uid}/${maGD}/trangthai`] = "Thành công";
+      update(ref(db), updates).then(() => {
+        alert("✔️ Duyệt thành công!");
+      });
     };
   </script>
+
 </body>
 </html>
