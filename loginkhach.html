@@ -2,86 +2,90 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Đăng nhập khách</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <script src="firebase.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 90%;
+      max-width: 300px;
+      padding: 10px;
+      margin: 8px;
+      border: none;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #ffcc00;
+      border: none;
+      color: black;
+      font-weight: bold;
+      margin: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body class="bg-light">
+<body>
+  <h1>Đăng nhập khách hàng</h1>
 
-  <div class="container mt-5">
-    <div class="card shadow">
-      <div class="card-body">
-        <h3 class="card-title text-center">Đăng nhập / Đăng ký</h3>
-
-        <div class="mb-3">
-          <label>Email:</label>
-          <input type="email" id="email" class="form-control" />
-        </div>
-
-        <div class="mb-3">
-          <label>Mật khẩu:</label>
-          <input type="password" id="password" class="form-control" />
-        </div>
-
-        <div class="d-flex justify-content-between">
-          <button class="btn btn-primary" onclick="login()">Đăng nhập</button>
-          <button class="btn btn-success" onclick="register()">Đăng ký</button>
-          <button class="btn btn-danger" onclick="logout()">Đăng xuất</button>
-        </div>
-
-        <div id="status" class="mt-3 text-center text-danger"></div>
-        <div id="userInfo" class="mt-3 text-center text-success fw-bold"></div>
-      </div>
-    </div>
+  <div id="auth-section">
+    <input type="email" id="email" placeholder="Email..." /><br/>
+    <input type="password" id="password" placeholder="Mật khẩu..." /><br/>
+    <button onclick="register()">Đăng ký</button>
+    <button onclick="login()">Đăng nhập</button>
   </div>
 
-  <script>
-    function login() {
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, pass)
-        .then(user => {
-          const uid = user.user.uid;
-          document.getElementById("status").innerText = "";
-          document.getElementById("userInfo").innerText = `UID: ${uid} | Đăng nhập thành công!`;
-          localStorage.setItem("uid", uid);
-        })
-        .catch(err => {
-          document.getElementById("status").innerText = "Đăng nhập thất bại: " + err.message;
-        });
-    }
+  <div id="status"></div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <!-- Firebase Config -->
+  <script src="firebase.js"></script>
+
+  <script>
     function register() {
       const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      auth.createUserWithEmailAndPassword(email, pass)
-        .then(user => {
-          const uid = user.user.uid;
-          document.getElementById("status").innerText = "";
-          document.getElementById("userInfo").innerText = `Tạo tài khoản thành công! UID: ${uid}`;
-          localStorage.setItem("uid", uid);
+      const password = document.getElementById("password").value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          alert("Đăng ký thành công!");
         })
-        .catch(err => {
-          document.getElementById("status").innerText = "Lỗi đăng ký: " + err.message;
+        .catch((error) => {
+          alert("Lỗi đăng ký: " + error.message);
         });
     }
 
-    function logout() {
-      auth.signOut().then(() => {
-        localStorage.removeItem("uid");
-        document.getElementById("userInfo").innerText = "";
-        document.getElementById("status").innerText = "Đã đăng xuất.";
-      });
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          localStorage.setItem("uid", user.uid);
+          document.getElementById("status").innerText = "Xin chào: " + user.email + "\nUID: " + user.uid;
+          alert("Đăng nhập thành công!");
+        })
+        .catch((error) => {
+          alert("Lỗi đăng nhập: " + error.message);
+        });
     }
-
-    // Kiểm tra nếu đã đăng nhập sẵn
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("userInfo").innerText = `UID: ${user.uid} | Đã đăng nhập`;
-        localStorage.setItem("uid", user.uid);
-      }
-    });
   </script>
 </body>
 </html>
