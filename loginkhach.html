@@ -3,112 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>Đăng nhập khách hàng</title>
-  <script src="firebase.js"></script>
-  <style>
-    body {
-      background-color: #1a1a1a;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    .form-box {
-      background: #2c2c2c;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 400px;
-      margin: auto;
-      box-shadow: 0 0 10px #444;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 6px;
-    }
-    button {
-      padding: 12px;
-      width: 100%;
-      background: #00bcd4;
-      border: none;
-      color: white;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0097a7;
-    }
-    .link {
-      margin-top: 10px;
-      display: block;
-      color: #ff9800;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="form-box">
-    <h2 id="form-title">🔐 Đăng nhập tài khoản</h2>
-    <input type="email" id="email" placeholder="Email..." />
-    <input type="password" id="password" placeholder="Mật khẩu..." />
-    <button onclick="handleAction()">Đăng nhập</button>
-    <span class="link" onclick="toggleForm()">👉 Chưa có tài khoản? Đăng ký tại đây</span>
-    <p id="status"></p>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+  <div class="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-4 text-center">Đăng nhập / Đăng ký</h2>
+
+    <input id="email" class="w-full p-2 mb-3 bg-gray-700 rounded" placeholder="Email..." type="email">
+    <input id="password" class="w-full p-2 mb-4 bg-gray-700 rounded" placeholder="Mật khẩu..." type="password">
+
+    <div class="flex justify-between">
+      <button onclick="login()" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">Đăng nhập</button>
+      <button onclick="register()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">Đăng ký</button>
+    </div>
+
+    <p id="status" class="mt-4 text-sm text-red-400 text-center"></p>
   </div>
 
-  <script>
-    let isLogin = true;
-    function toggleForm() {
-      isLogin = !isLogin;
-      document.getElementById('form-title').innerText = isLogin ? '🔐 Đăng nhập tài khoản' : '📝 Tạo tài khoản mới';
-      document.querySelector('button').innerText = isLogin ? 'Đăng nhập' : 'Đăng ký';
-      document.querySelector('.link').innerText = isLogin ? '👉 Chưa có tài khoản? Đăng ký tại đây' : '🔁 Đã có tài khoản? Quay lại đăng nhập';
-      document.getElementById('status').innerText = '';
-    }
+  <script src="firebase.js" type="module"></script>
+  <script type="module">
+    import { firebaseFunctions, auth } from './firebase.js';
 
-    function handleAction() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const status = document.getElementById('status');
-      status.innerText = "⏳ Đang xử lý...";
+    const { signInWithEmailAndPassword, createUserWithEmailAndPassword } = firebaseFunctions;
 
-      if (!email || !password) {
-        status.innerText = "❌ Vui lòng nhập đầy đủ thông tin.";
-        return;
+    window.login = async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+        localStorage.setItem("uid", uid);
+        localStorage.setItem("email", email);
+        window.location.href = "index.html";
+      } catch (err) {
+        document.getElementById("status").innerText = "Sai tài khoản hoặc mật khẩu!";
       }
+    };
 
-      if (isLogin) {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(userCredential => {
-            const user = userCredential.user;
-            localStorage.setItem('uid', user.uid);
-            localStorage.setItem('email', user.email);
-            status.innerText = "✅ Đăng nhập thành công!";
-            setTimeout(() => window.location.href = "index.html", 1500);
-          })
-          .catch(error => {
-            status.innerText = `❌ Lỗi: ${error.message}`;
-          });
-      } else {
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(userCredential => {
-            const user = userCredential.user;
-            localStorage.setItem('uid', user.uid);
-            localStorage.setItem('email', user.email);
-            status.innerText = "✅ Tạo tài khoản thành công! Vui lòng đăng nhập.";
-            setTimeout(() => toggleForm(), 2000);
-          })
-          .catch(error => {
-            status.innerText = `❌ Lỗi: ${error.message}`;
-          });
+    window.register = async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+        localStorage.setItem("uid", uid);
+        localStorage.setItem("email", email);
+        window.location.href = "index.html";
+      } catch (err) {
+        document.getElementById("status").innerText = "Lỗi đăng ký: " + err.message;
       }
-    }
+    };
   </script>
 </body>
 </html>
