@@ -1,114 +1,77 @@
-<<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-  <title>Admin Duyệt Tiền | GKDM Shop</title>
   <meta charset="UTF-8">
+  <title>Admin Duyệt Giao Dịch</title>
   <script src="firebase.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f0f0;
+      font-family: Arial;
       padding: 20px;
+      background: #f5f5f5;
     }
-    .hidden { display: none; }
     table {
       width: 100%;
-      background: white;
       border-collapse: collapse;
       margin-top: 20px;
+      background: white;
     }
     th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
+      padding: 8px;
       text-align: center;
     }
     th {
-      background: #ff5e57;
+      background: #333;
       color: white;
     }
     button {
-      padding: 6px 12px;
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #218838;
-    }
-    #login input {
-      padding: 8px;
-      margin-right: 10px;
+      padding: 5px 10px;
     }
   </style>
 </head>
 <body>
-  <div id="login">
-    <h2>Admin đăng nhập</h2>
-    <input type="password" id="pass" placeholder="Nhập mật khẩu admin">
-    <button onclick="checkPass()">Đăng nhập</button>
-  </div>
-
-  <div id="adminPanel" class="hidden">
-    <h2>Danh sách giao dịch chờ duyệt</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>UID</th>
-          <th>Nội dung</th>
-          <th>Trạng thái</th>
-          <th>Thời gian</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody id="gdList"></tbody>
-    </table>
-  </div>
+  <h2>Quản Lý Giao Dịch</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>UID</th>
+        <th>Nội dung</th>
+        <th>Thời gian</th>
+        <th>Trạng thái</th>
+        <th>Duyệt</th>
+      </tr>
+    </thead>
+    <tbody id="bangGD">
+    </tbody>
+  </table>
 
   <script>
-    const matkhau = "Maka26042006";
+    const bangGD = document.getElementById("bangGD");
 
-    function checkPass() {
-      const input = document.getElementById("pass").value;
-      if (input === matkhau) {
-        document.getElementById("login").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadData();
-      } else {
-        alert("Sai mật khẩu!");
-      }
-    }
+    firebase.database().ref("giaodich").on("value", (snapshot) => {
+      bangGD.innerHTML = "";
+      snapshot.forEach((child) => {
+        const data = child.val();
+        const tr = document.createElement("tr");
 
-    function loadData() {
-      db.ref("giaodich").on("value", (snapshot) => {
-        const data = snapshot.val();
-        const tbody = document.getElementById("gdList");
-        tbody.innerHTML = "";
-
-        for (let uid in data) {
-          const item = data[uid];
-          const row = document.createElement("tr");
-
-          row.innerHTML = `
-            <td>${item.uid}</td>
-            <td>${item.noidung}</td>
-            <td>${item.trangthai}</td>
-            <td>${item.thoigian}</td>
-            <td>
-              ${item.trangthai === "Đang chờ"
-                ? `<button onclick="duyet('${uid}')">Duyệt</button>`
-                : "✅ Đã duyệt"}
-            </td>
-          `;
-
-          tbody.appendChild(row);
-        }
+        tr.innerHTML = `
+          <td>${data.uid}</td>
+          <td>${data.noidung}</td>
+          <td>${data.thoigian}</td>
+          <td id="tt-${child.key}">${data.trangthai}</td>
+          <td>
+            ${data.trangthai === "Đang chờ" ? `<button onclick="duyet('${child.key}')">Duyệt</button>` : "✓"}
+          </td>
+        `;
+        bangGD.appendChild(tr);
       });
-    }
+    });
 
-    function duyet(uid) {
-      db.ref("giaodich/" + uid + "/trangthai").set("Thành công");
+    function duyet(id) {
+      firebase.database().ref("giaodich/" + id).update({
+        trangthai: "Thành công"
+      });
     }
   </script>
 </body>
