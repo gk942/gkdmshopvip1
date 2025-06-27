@@ -2,92 +2,112 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Đăng Nhập Khách</title>
+  <title>Đăng nhập khách hàng</title>
   <script src="firebase.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #101522;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 50px;
+      background-color: #1a1a1a;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 40px;
     }
     .form-box {
-      background: #1e293b;
+      background: #2c2c2c;
       padding: 30px;
       border-radius: 10px;
-      width: 300px;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 5px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px #444;
     }
     input {
-      background: #334155;
-      color: white;
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
     }
     button {
-      background: #3b82f6;
+      padding: 12px;
+      width: 100%;
+      background: #00bcd4;
+      border: none;
       color: white;
+      border-radius: 6px;
+      font-weight: bold;
       cursor: pointer;
     }
     button:hover {
-      background: #2563eb;
+      background: #0097a7;
     }
-    .note {
-      font-size: 0.9em;
-      color: #94a3b8;
+    .link {
+      margin-top: 10px;
+      display: block;
+      color: #ff9800;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h2>🔐 Tài khoản khách</h2>
   <div class="form-box">
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Mật khẩu">
-    <button onclick="handleAction()">Đăng nhập / Đăng ký</button>
-    <p id="status" class="note"></p>
+    <h2 id="form-title">🔐 Đăng nhập tài khoản</h2>
+    <input type="email" id="email" placeholder="Email..." />
+    <input type="password" id="password" placeholder="Mật khẩu..." />
+    <button onclick="handleAction()">Đăng nhập</button>
+    <span class="link" onclick="toggleForm()">👉 Chưa có tài khoản? Đăng ký tại đây</span>
+    <p id="status"></p>
   </div>
 
   <script>
-    function handleAction() {
-      const email = document.getElementById('email').value;
-      const pass = document.getElementById('password').value;
-      const status = document.getElementById('status');
+    let isLogin = true;
+    function toggleForm() {
+      isLogin = !isLogin;
+      document.getElementById('form-title').innerText = isLogin ? '🔐 Đăng nhập tài khoản' : '📝 Tạo tài khoản mới';
+      document.querySelector('button').innerText = isLogin ? 'Đăng nhập' : 'Đăng ký';
+      document.querySelector('.link').innerText = isLogin ? '👉 Chưa có tài khoản? Đăng ký tại đây' : '🔁 Đã có tài khoản? Quay lại đăng nhập';
+      document.getElementById('status').innerText = '';
+    }
 
-      if (!email || !pass) {
-        status.textContent = '❌ Vui lòng nhập đầy đủ thông tin.';
+    function handleAction() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const status = document.getElementById('status');
+      status.innerText = "⏳ Đang xử lý...";
+
+      if (!email || !password) {
+        status.innerText = "❌ Vui lòng nhập đầy đủ thông tin.";
         return;
       }
 
-      status.textContent = "⏳ Đang xử lý...";
-
-      auth.signInWithEmailAndPassword(email, pass)
-        .then(userCredential => {
-          const uid = userCredential.user.uid;
-          localStorage.setItem('user_uid', uid);
-          window.location.href = "index.html";
-        })
-        .catch(error => {
-          if (error.code === 'auth/user-not-found') {
-            auth.createUserWithEmailAndPassword(email, pass)
-              .then(userCredential => {
-                const uid = userCredential.user.uid;
-                localStorage.setItem('user_uid', uid);
-                window.location.href = "index.html";
-              })
-              .catch(err => {
-                status.textContent = "❌ Lỗi: " + err.message;
-              });
-          } else {
-            status.textContent = "❌ Firebase: " + error.message;
-          }
-        });
+      if (isLogin) {
+        auth.signInWithEmailAndPassword(email, password)
+          .then(userCredential => {
+            const user = userCredential.user;
+            localStorage.setItem('uid', user.uid);
+            localStorage.setItem('email', user.email);
+            status.innerText = "✅ Đăng nhập thành công!";
+            setTimeout(() => window.location.href = "index.html", 1500);
+          })
+          .catch(error => {
+            status.innerText = `❌ Lỗi: ${error.message}`;
+          });
+      } else {
+        auth.createUserWithEmailAndPassword(email, password)
+          .then(userCredential => {
+            const user = userCredential.user;
+            localStorage.setItem('uid', user.uid);
+            localStorage.setItem('email', user.email);
+            status.innerText = "✅ Tạo tài khoản thành công! Vui lòng đăng nhập.";
+            setTimeout(() => toggleForm(), 2000);
+          })
+          .catch(error => {
+            status.innerText = `❌ Lỗi: ${error.message}`;
+          });
+      }
     }
   </script>
 </body>
