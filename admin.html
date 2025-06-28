@@ -3,89 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin Duyệt Giao Dịch</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <title>Trang Quản Trị Admin</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to bottom right, #1a1a2e, #16213e);
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e1e2f;
       color: #fff;
-      padding: 20px;
       margin: 0;
-    }
-    h2 {
-      text-align: center;
-      color: #00f7ff;
-    }
-    #loginForm {
-      max-width: 400px;
-      margin: auto;
-      text-align: center;
-      background: #0f3460;
       padding: 20px;
-      border-radius: 10px;
     }
-    input, button {
+    h1 {
+      text-align: center;
+      color: #00ffc8;
+    }
+    #adminSection {
+      display: none;
+      margin-top: 20px;
+    }
+    #loginSection {
+      text-align: center;
+      margin-top: 50px;
+    }
+    input[type="password"] {
       padding: 10px;
-      margin-top: 10px;
-      width: 90%;
+      font-size: 16px;
+      border-radius: 6px;
       border: none;
-      border-radius: 5px;
+      width: 250px;
     }
     button {
-      background-color: #00f7ff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      background-color: #00ffc8;
       color: #000;
       cursor: pointer;
-      font-weight: bold;
+      margin-left: 10px;
     }
     button:hover {
-      background-color: #00c8d4;
-    }
-    #adminContent {
-      display: none;
-      margin-top: 30px;
+      background-color: #00cca3;
     }
     table {
       width: 100%;
+      margin-top: 30px;
       border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #0f3460;
-      color: #fff;
+      background-color: #292940;
     }
     th, td {
-      border: 1px solid #00f7ff;
+      border: 1px solid #444;
       padding: 10px;
       text-align: center;
     }
     th {
-      background-color: #1a1a2e;
+      background-color: #00ffc8;
+      color: #000;
     }
-    .status-waiting {
-      color: orange;
+    td button {
+      background-color: #28c76f;
+      color: white;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
     }
-    .status-success {
-      color: #00ff00;
+    td button:hover {
+      background-color: #20b265;
     }
   </style>
 </head>
 <body>
+  <h1>🛠️ TRANG QUẢN TRỊ ADMIN</h1>
 
-  <div id="loginForm">
-    <h2>🔒 Đăng nhập Admin</h2>
-    <input type="password" id="adminPassword" placeholder="Nhập mật khẩu admin">
-    <button onclick="checkAdmin()">Đăng nhập</button>
-    <p id="loginStatus" style="color: red; margin-top: 10px;"></p>
+  <div id="loginSection">
+    <input type="password" id="adminPassword" placeholder="Nhập mật khẩu admin...">
+    <button onclick="checkAdmin()">🔐 Đăng nhập</button>
   </div>
 
-  <div id="adminContent">
-    <h2>📋 Danh sách giao dịch cần duyệt</h2>
-    <div id="transactionsTable">⏳ Đang tải dữ liệu...</div>
+  <div id="adminSection">
+    <h2>📋 Danh sách giao dịch chờ duyệt</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Nội dung</th>
+          <th>Số tiền</th>
+          <th>Thời gian</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="lichsugiaodich">
+        <tr><td colspan="6">⏳ Đang tải dữ liệu...</td></tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDBaWDDCkhRa3DQcJBYdznL98GjHmXspuI",
@@ -101,74 +117,79 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const ADMIN_PASSWORD = "Maka26042006";
-
     function checkAdmin() {
-      const pass = document.getElementById("adminPassword").value;
-      if (pass === ADMIN_PASSWORD) {
-        document.getElementById("loginForm").style.display = "none";
-        document.getElementById("adminContent").style.display = "block";
-        loadTransactions();
+      const input = document.getElementById("adminPassword").value;
+      if (input === "Maka26042006") {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("adminSection").style.display = "block";
+        loadGiaoDich();
       } else {
-        document.getElementById("loginStatus").innerText = "❌ Sai mật khẩu!";
+        alert("❌ Sai mật khẩu quản trị.");
       }
     }
 
-    function loadTransactions() {
-      const transRef = ref(db, "giaodich");
-      onValue(transRef, (snapshot) => {
+    window.checkAdmin = checkAdmin;
+
+    function loadGiaoDich() {
+      const giaoDichRef = ref(db, 'giaodich');
+      onValue(giaoDichRef, (snapshot) => {
         const data = snapshot.val();
-        const container = document.getElementById("transactionsTable");
-        if (!data) {
-          container.innerHTML = "<p>Không có giao dịch nào.</p>";
-          return;
+        const table = document.getElementById("lichsugiaodich");
+        table.innerHTML = "";
+
+        if (data) {
+          Object.keys(data).forEach(uid => {
+            Object.keys(data[uid]).forEach(key => {
+              const item = data[uid][key];
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${item.email}</td>
+                <td>${item.noidung}</td>
+                <td>${item.sotien}</td>
+                <td>${item.thoigian}</td>
+                <td class="trangthai">${item.trangthai}</td>
+                <td>
+                  ${item.trangthai === "đang chờ"
+                    ? `<button onclick="duyetGiaoDich('${uid}', '${key}', ${item.sotien}, this)">✅ Duyệt</button>`
+                    : "✅ Đã duyệt"}
+                </td>
+              `;
+              table.appendChild(row);
+            });
+          });
+        } else {
+          table.innerHTML = "<tr><td colspan='6'>Không có giao dịch nào</td></tr>";
         }
+      });
+    }
 
-        let html = `
-          <table>
-            <tr>
-              <th>UID</th>
-              <th>Email</th>
-              <th>Số tiền</th>
-              <th>Trạng thái</th>
-              <th>Duyệt</th>
-            </tr>
-        `;
-
-        Object.entries(data).forEach(([uid, info]) => {
-          html += `
-            <tr>
-              <td>${uid}</td>
-              <td>${info.email || ''}</td>
-              <td>${info.sotien || 0}đ</td>
-              <td class="${info.trangthai === 'Thành công' ? 'status-success' : 'status-waiting'}">
-                ${info.trangthai}
-              </td>
-              <td>
-                ${info.trangthai === 'Đang chờ' ? `<button onclick="duyetGiaoDich('${uid}')">Duyệt</button>` : '✅'}
-              </td>
-            </tr>
-          `;
+    window.duyetGiaoDich = async function (uid, key, sotien, button) {
+      try {
+        // Cập nhật trạng thái giao dịch
+        await update(ref(db, `giaodich/${uid}/${key}`), {
+          trangthai: "thành công"
         });
 
-        html += `</table>`;
-        container.innerHTML = html;
-      });
-    }
+        // Lấy số dư hiện tại
+        const soduSnap = await get(ref(db, `users/${uid}/sodu`));
+        const currentSodu = soduSnap.exists() ? Number(soduSnap.val()) : 0;
+        const newSodu = currentSodu + Number(sotien);
 
-    function duyetGiaoDich(uid) {
-      const updateRef = ref(db, `giaodich/${uid}`);
-      update(updateRef, {
-        trangthai: "Thành công"
-      }).then(() => {
-        alert("✅ Đã duyệt thành công!");
-      });
-    }
+        // Cập nhật số dư
+        await update(ref(db, `users/${uid}`), {
+          sodu: newSodu
+        });
 
-    // Fix: Gắn hàm vào window để HTML gọi được
-    window.checkAdmin = checkAdmin;
-    window.duyetGiaoDich = duyetGiaoDich;
+        // Cập nhật giao diện
+        const row = button.parentElement.parentElement;
+        row.querySelector(".trangthai").innerText = "thành công";
+        button.outerHTML = "✅ Đã duyệt";
+        alert("✅ Giao dịch đã duyệt & cộng tiền!");
+      } catch (err) {
+        console.error("❌ Lỗi khi duyệt:", err);
+        alert("❌ Có lỗi xảy ra khi duyệt giao dịch.");
+      }
+    };
   </script>
-
 </body>
 </html>
